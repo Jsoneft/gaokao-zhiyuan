@@ -1,0 +1,67 @@
+# 编译产物
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go 测试文件
+*.test
+*.out
+
+# Go 依赖模块
+/vendor/
+
+# 环境配置文件
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+*.tmp
+*.temp
+.tmp/
+
+# IDE 文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# 数据文件（Excel文件太大，超过GitHub限制）
+*.xlsx
+*.xls
+21-24各省份录取数据(含专业组代码).xlsx
+
+# 构建目录
+/build/
+/dist/
+
+# 测试覆盖率
+coverage.out
+coverage.html
+
+# 调试信息
+debug
+
+# Go sum 文件（可选）
+# go.sum 
