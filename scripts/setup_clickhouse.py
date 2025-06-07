@@ -53,11 +53,11 @@ def create_database_schema():
 
 def process_excel_data():
     """处理Excel数据，生成SQL文件"""
-    if not os.path.exists("scripts/process_excel.py"):
+    if not os.path.exists("process_excel.py"):
         print("错误: 找不到Excel处理脚本!")
         return False
     
-    success = run_command("python3 scripts/process_excel.py")
+    success = run_command("python3 process_excel.py")
     if not success:
         print("处理Excel数据失败!")
         return False

@@ -18,27 +18,48 @@ def clean_text(text):
 def main():
     # 读取Excel文件
     print("正在读取Excel文件...")
-    file_path = "21-24各省份录取数据(含专业组代码).xlsx"
+    file_path = "../21-24各省份录取数据(含专业组代码).xlsx"
     df = pd.read_excel(file_path)
     
-    # 显示前20列的列名
-    for i in range(20):
+    # 显示前30列的列名
+    print("\n列名:")
+    for i in range(30):
         if i < len(df.columns):
             print(f"列 {i}: {df.columns[i]}")
     
     # 获取第一行的数据，这是实际的字段名
     print("\n第一行数据（实际字段名）:")
     first_row = df.iloc[0]
-    for i in range(20):
+    for i in range(30):
         if i < len(first_row):
             print(f"列 {i}: {first_row[i]}")
+    
+    # 显示前5行数据中的列15到20
+    print("\n前5行数据中的列15到20:")
+    for row_idx in range(1, 6):  # 跳过第一行（列名）
+        if row_idx < len(df):
+            row_data = df.iloc[row_idx]
+            print(f"\n行 {row_idx}:")
+            for col_idx in range(15, 21):
+                if col_idx < len(row_data):
+                    print(f"列 {col_idx}: {row_data[col_idx]}")
+    
+    print("\n检查列18和19（可能是最低分和最低位次）:")
+    for row_idx in range(1, 6):
+        if row_idx < len(df):
+            row_data = df.iloc[row_idx]
+            print(f"\n行 {row_idx}:")
+            if 18 < len(row_data):
+                print(f"列 18: {row_data[18]}")
+            if 19 < len(row_data):
+                print(f"列 19: {row_data[19]}")
     
     # 重新创建DataFrame，跳过第一行（原始列名是第一行）
     df = pd.read_excel(file_path, skiprows=1)
     
     # 确定2024年录取最低分和最低位次的列索引
-    lowest_points_2024_col = 15  # 2024年录取数据 - 录取最低分
-    lowest_rank_2024_col = 16    # Unnamed: 16 - 录取最低位次
+    lowest_points_2024_col = 17  # 专业组最低分（修正）
+    lowest_rank_2024_col = 18    # 专业组最低位次（修正）
     
     # 准备要处理的列
     cols_to_process = {
@@ -53,8 +74,8 @@ def main():
         8: "professional_code",   # 专业代码
         9: "professional_name",   # 专业名称
         10: "description",        # 专业备注
-        lowest_points_2024_col: "lowest_points",  # 录取最低分
-        lowest_rank_2024_col: "lowest_rank",      # 录取最低位次
+        lowest_points_2024_col: "lowest_points",  # 录取最低分（修正为专业组最低分）
+        lowest_rank_2024_col: "lowest_rank",      # 录取最低位次（修正为专业组最低位次）
     }
     
     # 创建新的DataFrame，只保留需要的列
