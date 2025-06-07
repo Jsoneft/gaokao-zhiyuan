@@ -7,6 +7,8 @@ import (
 	"gaokao-zhiyuan/database"
 	_ "gaokao-zhiyuan/models"
 
+	"log"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,12 +42,11 @@ func (h *Handler) GetRank(c *gin.Context) {
 	}
 
 	// 使用默认参数
-	province := "重庆"
+	province := "湖北"
 	year := 2024
-	subjectType := "物理"
-	classDemands := []string{"物", "化", "生"}
 
-	rank, err := h.db.QueryRankByScore(province, year, float64(score), subjectType, classDemands)
+	// 直接根据分数查询位次，不指定科类和选科限制
+	rank, err := h.db.QueryRankByScoreSimple(province, year, float64(score))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": 1,
@@ -84,7 +85,7 @@ func (h *Handler) QueryRank(c *gin.Context) {
 
 	// 参数验证
 	if req.Province == "" {
-		req.Province = "重庆"
+		req.Province = "湖北"
 	}
 	if req.Year == 0 {
 		req.Year = 2024
@@ -117,13 +118,14 @@ func (h *Handler) QueryRank(c *gin.Context) {
 }
 
 // 报表查询接口
-// GET /api/report/get?rank=12000&class_comb="123"&page=1&page_size=20
+// GET /api/report/get?rank=12000&class_comb="123"&page=1&page_size=20&province=湖北
 func (h *Handler) GetReport(c *gin.Context) {
 	// 获取参数
 	rankStr := c.Query("rank")
 	classComb := c.Query("class_comb")
 	pageStr := c.DefaultQuery("page", "1")
 	pageSizeStr := c.DefaultQuery("page_size", "20")
+	province := c.Query("province")
 
 	if rankStr == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -152,7 +154,10 @@ func (h *Handler) GetReport(c *gin.Context) {
 		pageSize = 20
 	}
 
-	result, err := h.db.GetReportData(rank, classComb, page, pageSize)
+	log.Printf("报表查询请求: 位次=%d, 选科=%s, 页码=%d, 每页条数=%d, 省份=%s",
+		rank, classComb, page, pageSize, province)
+
+	result, err := h.db.GetReportData(rank, classComb, province, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": 1,

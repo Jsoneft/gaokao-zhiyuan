@@ -248,7 +248,7 @@ func (db *ClickHouseDB) QueryScoreByRank(province string, year int, rank int64, 
 }
 
 // 查询报表数据
-func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSize int64) (*models.Response, error) {
+func (db *ClickHouseDB) GetReportData(rank int64, classComb string, province string, page, pageSize int64) (*models.Response, error) {
 	// 获取2024年对应位次的分数
 	var rankScore int64
 	scoreQuery := `
@@ -272,11 +272,17 @@ func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSi
 			row = db.conn.QueryRow(context.Background(), nearbyQuery, rank)
 			err = row.Scan(&rankScore)
 			if err != nil {
+				log.Printf("无法找到位次 %d 附近的数据，使用默认分数 500", rank)
 				rankScore = 500 // 默认分数
+			} else {
+				log.Printf("找到位次 %d 附近的数据，对应分数为 %d", rank, rankScore)
 			}
 		} else {
+			log.Printf("查询位次 %d 对应分数时出错: %v", rank, err)
 			return nil, err
 		}
+	} else {
+		log.Printf("位次 %d 对应的分数为 %d", rank, rankScore)
 	}
 
 	// 计算分数范围：在位次对应分数基础上，上浮+20分，下浮-30分
@@ -285,25 +291,45 @@ func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSi
 	if lowerScore < 0 {
 		lowerScore = 0
 	}
+	log.Printf("分数范围设置为 %d-%d", lowerScore, upperScore)
 
 	// 构建选科条件
 	classCondition := buildClassCondition(classComb)
 
+	// 构建省份条件
+	provinceCondition := ""
+	if province != "" {
+		provinceCondition = fmt.Sprintf("AND province = '%s'", province)
+		log.Printf("添加省份筛选条件: %s", province)
+	}
+
 	// 查询总数
 	countQuery := fmt.Sprintf(`
-	SELECT COUNT(*) FROM gaokao.admission_data 
+	SELECT COUNT(*) AS total_count FROM gaokao.admission_data 
 	WHERE year = 2024 
 	AND lowest_points BETWEEN ? AND ? 
 	%s
-	`, classCondition)
+	%s
+	`, classCondition, provinceCondition)
 
-	var totalCount int64
-	row = db.conn.QueryRow(context.Background(), countQuery, lowerScore, upperScore)
-	row.Scan(&totalCount)
+	log.Printf("执行计数查询: %s", countQuery)
+	var totalCountUint uint64 // 使用uint64接收COUNT()结果
+	err = db.conn.QueryRow(context.Background(), countQuery, lowerScore, upperScore).Scan(&totalCountUint)
+	if err != nil {
+		log.Printf("计数查询失败: %v", err)
+		totalCountUint = 0
+	}
+	totalCount := int64(totalCountUint) // 转换为int64
+	log.Printf("查询到符合条件的记录总数: %d", totalCount)
 
 	// 计算分页
 	offset := (page - 1) * pageSize
-	totalPages := (totalCount + pageSize - 1) / pageSize
+	totalPages := int64(0)
+	if totalCount > 0 {
+		totalPages = (totalCount + pageSize - 1) / pageSize
+	}
+	log.Printf("分页信息: 当前页=%d, 每页条数=%d, 总页数=%d, 偏移量=%d",
+		page, pageSize, totalPages, offset)
 
 	// 查询数据
 	dataQuery := fmt.Sprintf(`
@@ -313,12 +339,15 @@ func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSi
 	WHERE year = 2024 
 	AND lowest_points BETWEEN ? AND ? 
 	%s
+	%s
 	ORDER BY lowest_points DESC
 	LIMIT ? OFFSET ?
-	`, classCondition)
+	`, classCondition, provinceCondition)
 
+	log.Printf("执行数据查询: %s", dataQuery)
 	rows, err := db.conn.Query(context.Background(), dataQuery, lowerScore, upperScore, pageSize, offset)
 	if err != nil {
+		log.Printf("数据查询失败: %v", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -349,6 +378,7 @@ func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSi
 		}
 		list = append(list, item)
 	}
+	log.Printf("查询到 %d 条符合条件的记录", len(list))
 
 	conf := &models.Conf{
 		Page:        page,
@@ -370,6 +400,7 @@ func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSi
 // 构建选科条件
 func buildClassCondition(classComb string) string {
 	if classComb == "" {
+		log.Printf("未提供选科组合，不添加选科筛选条件")
 		return ""
 	}
 
@@ -398,6 +429,7 @@ func buildClassCondition(classComb string) string {
 	}
 
 	if len(subjects) == 0 {
+		log.Printf("选科组合 %s 无法识别任何有效科目，不添加选科筛选条件", classComb)
 		return ""
 	}
 
@@ -405,6 +437,8 @@ func buildClassCondition(classComb string) string {
 
 	// 构建SQL条件，选科要求包含用户选的科目或者不限
 	var conditions []string
+
+	// 添加包含所有用户选科的条件
 	for _, subject := range subjects {
 		conditions = append(conditions, fmt.Sprintf("class_demand LIKE '%%%s%%'", subject))
 	}
@@ -412,7 +446,10 @@ func buildClassCondition(classComb string) string {
 	// 添加不限选项
 	conditions = append(conditions, "class_demand = '不限'", "class_demand = ''")
 
-	return fmt.Sprintf("AND (%s)", strings.Join(conditions, " OR "))
+	conditionStr := fmt.Sprintf("AND (%s)", strings.Join(conditions, " OR "))
+	log.Printf("构建的选科SQL条件: %s", conditionStr)
+
+	return conditionStr
 }
 
 // 获取数据记录数
@@ -424,4 +461,47 @@ func (db *ClickHouseDB) GetDataCount() (int64, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+// 根据分数查询位次（简化版，不考虑科类和选科条件）
+func (db *ClickHouseDB) QueryRankByScoreSimple(province string, year int, score float64) (int64, error) {
+	// 查询语句：根据分数查询位次
+	// 使用lowest_rank排序，找到分数大于等于给定分数的最大位次
+	query := `
+		SELECT lowest_rank
+		FROM gaokao.admission_data
+		WHERE province = $1
+		AND year = $2
+		AND lowest_points >= $3
+		AND lowest_rank > 0
+		ORDER BY lowest_points ASC
+		LIMIT 1
+	`
+
+	var rank int64
+	err := db.conn.QueryRow(context.Background(), query, province, year, score).Scan(&rank)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// 如果没有找到记录，查询该省份该年份最低分最高的记录的位次
+			estimateQuery := `
+				SELECT lowest_rank
+				FROM gaokao.admission_data
+				WHERE province = $1
+				AND year = $2
+				AND lowest_points > 0
+				AND lowest_rank > 0
+				ORDER BY lowest_points DESC
+				LIMIT 1
+			`
+			var estimateRank int64
+			err = db.conn.QueryRow(context.Background(), estimateQuery, province, year).Scan(&estimateRank)
+			if err != nil {
+				return 0, errors.New("无法估算位次")
+			}
+			return estimateRank, nil
+		}
+		return 0, err
+	}
+
+	return rank, nil
 }

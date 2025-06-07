@@ -9,11 +9,21 @@ import (
 	"gaokao-zhiyuan/handlers"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// 加载.env文件
+	if err := godotenv.Load(); err != nil {
+		log.Printf("警告: 未找到.env文件或加载失败: %v", err)
+	}
+
 	// 加载配置
 	cfg := config.LoadConfig()
+
+	// 输出连接信息
+	log.Printf("使用ClickHouse连接: %s:%d, 用户: %s, 数据库: %s",
+		cfg.ClickHouseHost, cfg.ClickHousePort, cfg.ClickHouseUser, cfg.ClickHouseDatabase)
 
 	// 设置Gin模式
 	gin.SetMode(cfg.GinMode)
