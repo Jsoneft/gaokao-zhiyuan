@@ -14,7 +14,7 @@ import (
 func main() {
 	// 加载配置
 	cfg := config.LoadConfig()
-	
+
 	// 设置Gin模式
 	gin.SetMode(cfg.GinMode)
 
@@ -51,12 +51,12 @@ func setupRouter(handler *handlers.Handler) *gin.Engine {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Origin, Content-Length, Content-Type, Authorization")
-		
+
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(http.StatusNoContent)
 			return
 		}
-		
+
 		c.Next()
 	})
 
@@ -65,13 +65,20 @@ func setupRouter(handler *handlers.Handler) *gin.Engine {
 	{
 		// 健康检查
 		api.GET("/health", handler.HealthCheck)
-		
+
 		// 位次查询接口
 		api.GET("/rank/get", handler.GetRank)
-		
+
 		// 报表查询接口
 		api.GET("/report/get", handler.GetReport)
 	}
 
+	// V1 API路由 - 新增接口
+	v1 := router.Group("/api/v1")
+	{
+		// 高级查询位次接口
+		v1.POST("/query_rank", handler.QueryRank)
+	}
+
 	return router
-} 
+}

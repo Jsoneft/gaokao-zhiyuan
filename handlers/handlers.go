@@ -39,7 +39,13 @@ func (h *Handler) GetRank(c *gin.Context) {
 		return
 	}
 
-	result, err := h.db.GetRankByScore(score)
+	// 使用默认参数
+	province := "重庆"
+	year := 2024
+	subjectType := "物理"
+	classDemands := []string{"物", "化", "生"}
+
+	rank, err := h.db.QueryRankByScore(province, year, float64(score), subjectType, classDemands)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": 1,
@@ -48,7 +54,66 @@ func (h *Handler) GetRank(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"code":  0,
+		"msg":   "success",
+		"rank":  rank,
+		"year":  year,
+		"score": score,
+	})
+}
+
+// 高级查询位次接口
+// POST /api/v1/query_rank
+func (h *Handler) QueryRank(c *gin.Context) {
+	var req struct {
+		Province    string   `json:"province"`
+		Year        int      `json:"year"`
+		Score       int64    `json:"score"`
+		SubjectType string   `json:"subject_type"`
+		ClassDemand []string `json:"class_demand"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": 1,
+			"msg":  "请求参数错误: " + err.Error(),
+		})
+		return
+	}
+
+	// 参数验证
+	if req.Province == "" {
+		req.Province = "重庆"
+	}
+	if req.Year == 0 {
+		req.Year = 2024
+	}
+	if req.SubjectType == "" {
+		req.SubjectType = "物理"
+	}
+	if len(req.ClassDemand) == 0 {
+		req.ClassDemand = []string{"物", "化", "生"}
+	}
+
+	rank, err := h.db.QueryRankByScore(req.Province, req.Year, float64(req.Score), req.SubjectType, req.ClassDemand)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": 1,
+			"msg":  "查询失败: " + err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":         0,
+		"msg":          "success",
+		"rank":         rank,
+		"year":         req.Year,
+		"province":     req.Province,
+		"subject_type": req.SubjectType,
+		"score":        req.Score,
+	})
 }
 
 // 报表查询接口
@@ -105,4 +170,4 @@ func (h *Handler) HealthCheck(c *gin.Context) {
 		"status": "ok",
 		"msg":    "高考志愿填报辅助系统后端服务运行正常",
 	})
-} 
+}

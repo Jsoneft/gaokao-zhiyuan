@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -87,16 +88,19 @@ func (db *ClickHouseDB) CreateTable() error {
 		id UInt64,
 		year UInt32,
 		province String,
-		college_name String,
+		batch String,
+		subject_type String,
+		class_demand String,
 		college_code String,
 		special_interest_group_code String,
+		college_name String,
+		professional_code String,
 		professional_name String,
-		class_demand String,
 		lowest_points Int64,
 		lowest_rank Int64,
 		description String
 	) ENGINE = MergeTree()
-	ORDER BY (year, lowest_points, lowest_rank)
+	ORDER BY (lowest_rank, lowest_points, year, province)
 	`
 	return db.conn.Exec(context.Background(), query)
 }
@@ -104,7 +108,7 @@ func (db *ClickHouseDB) CreateTable() error {
 // 批量插入数据
 func (db *ClickHouseDB) BatchInsert(data []models.AdmissionData) error {
 	batch, err := db.conn.PrepareBatch(context.Background(),
-		"INSERT INTO admission_data (id, year, province, college_name, college_code, special_interest_group_code, professional_name, class_demand, lowest_points, lowest_rank, description)")
+		"INSERT INTO admission_data (id, year, province, batch, subject_type, class_demand, college_code, special_interest_group_code, college_name, professional_code, professional_name, lowest_points, lowest_rank, description)")
 	if err != nil {
 		return err
 	}
@@ -114,11 +118,14 @@ func (db *ClickHouseDB) BatchInsert(data []models.AdmissionData) error {
 			item.ID,
 			item.Year,
 			item.Province,
-			item.CollegeName,
+			item.Batch,
+			item.SubjectType,
+			item.ClassDemand,
 			item.CollegeCode,
 			item.SpecialInterestGroupCode,
+			item.CollegeName,
+			item.ProfessionalCode,
 			item.ProfessionalName,
-			item.ClassDemand,
 			item.LowestPoints,
 			item.LowestRank,
 			item.Description,
@@ -132,63 +139,149 @@ func (db *ClickHouseDB) BatchInsert(data []models.AdmissionData) error {
 }
 
 // 根据分数查询位次
-func (db *ClickHouseDB) GetRankByScore(score int64) (*models.RankResponse, error) {
-	var rank int64
-	var year int
-
-	// 查询2024年数据中对应分数的位次
-	query := `
-	SELECT lowest_rank, year FROM admission_data 
-	WHERE year = 2024 AND lowest_points <= ? 
-	ORDER BY lowest_points DESC 
-	LIMIT 1
-	`
-
-	row := db.conn.QueryRow(context.Background(), query, score)
-	err := row.Scan(&rank, &year)
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return &models.RankResponse{
-				Code: 1,
-				Msg:  "未找到对应分数的位次信息",
-			}, nil
+func (db *ClickHouseDB) QueryRankByScore(province string, year int, score float64, subjectType string, classDemands []string) (int64, error) {
+	// 构建科目类型和选科要求的条件
+	classDemandCondition := ""
+	if len(classDemands) > 0 {
+		conditions := make([]string, 0, len(classDemands))
+		for _, demand := range classDemands {
+			conditions = append(conditions, fmt.Sprintf("class_demand LIKE '%%%s%%'", demand))
 		}
-		return nil, err
+		classDemandCondition = "AND (" + strings.Join(conditions, " OR ") + ")"
 	}
 
-	return &models.RankResponse{
-		Code: 0,
-		Msg:  "success",
-		Rank: rank,
-		Year: year,
-	}, nil
+	// 查询语句：根据分数查询位次
+	// 使用lowest_rank排序，找到分数大于等于给定分数的最大位次
+	query := fmt.Sprintf(`
+		SELECT lowest_rank
+		FROM gaokao.admission_data
+		WHERE province = $1
+		AND year = $2
+		AND subject_type = $3
+		%s
+		AND lowest_points >= $4
+		ORDER BY lowest_points ASC
+		LIMIT 1
+	`, classDemandCondition)
+
+	var rank int64
+	err := db.conn.QueryRow(context.Background(), query, province, year, subjectType, score).Scan(&rank)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// 如果没有找到记录，查询该省份该年份最低分最高的记录的位次
+			estimateQuery := `
+				SELECT lowest_rank
+				FROM gaokao.admission_data
+				WHERE province = $1
+				AND year = $2
+				AND subject_type = $3
+				AND lowest_points > 0
+				ORDER BY lowest_points DESC
+				LIMIT 1
+			`
+			var estimateRank int64
+			err = db.conn.QueryRow(context.Background(), estimateQuery, province, year, subjectType).Scan(&estimateRank)
+			if err != nil {
+				return 0, errors.New("无法估算位次")
+			}
+			return estimateRank, nil
+		}
+		return 0, err
+	}
+
+	return rank, nil
+}
+
+// 根据位次查询分数
+func (db *ClickHouseDB) QueryScoreByRank(province string, year int, rank int64, subjectType string, classDemands []string) (int64, error) {
+	// 构建科目类型和选科要求的条件
+	classDemandCondition := ""
+	if len(classDemands) > 0 {
+		conditions := make([]string, 0, len(classDemands))
+		for _, demand := range classDemands {
+			conditions = append(conditions, fmt.Sprintf("class_demand LIKE '%%%s%%'", demand))
+		}
+		classDemandCondition = "AND (" + strings.Join(conditions, " OR ") + ")"
+	}
+
+	// 查询语句：根据位次查询分数
+	// 使用lowest_rank排序，找到位次小于等于给定位次的最低分
+	query := fmt.Sprintf(`
+		SELECT lowest_points
+		FROM gaokao.admission_data
+		WHERE province = $1
+		AND year = $2
+		AND subject_type = $3
+		%s
+		AND lowest_rank <= $4
+		AND lowest_rank > 0
+		ORDER BY lowest_rank DESC
+		LIMIT 1
+	`, classDemandCondition)
+
+	var score int64
+	err := db.conn.QueryRow(context.Background(), query, province, year, subjectType, rank).Scan(&score)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// 如果没有找到记录，查询该省份该年份最高位次最低的记录的分数
+			estimateQuery := `
+				SELECT lowest_points
+				FROM gaokao.admission_data
+				WHERE province = $1
+				AND year = $2
+				AND subject_type = $3
+				AND lowest_rank > 0
+				ORDER BY lowest_rank ASC
+				LIMIT 1
+			`
+			var estimateScore int64
+			err = db.conn.QueryRow(context.Background(), estimateQuery, province, year, subjectType).Scan(&estimateScore)
+			if err != nil {
+				return 0, errors.New("无法估算分数")
+			}
+			return estimateScore, nil
+		}
+		return 0, err
+	}
+
+	return score, nil
 }
 
 // 查询报表数据
 func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSize int64) (*models.Response, error) {
-	// 首先根据位次计算去年等位分
-	var lastYearScore int64
+	// 获取2024年对应位次的分数
+	var rankScore int64
 	scoreQuery := `
-	SELECT lowest_points FROM admission_data 
-	WHERE year = 2023 AND lowest_rank >= ? 
-	ORDER BY lowest_rank ASC 
+	SELECT lowest_points FROM gaokao.admission_data 
+	WHERE year = 2024 AND lowest_rank <= ? AND lowest_rank > 0
+	ORDER BY lowest_rank DESC 
 	LIMIT 1
 	`
 
 	row := db.conn.QueryRow(context.Background(), scoreQuery, rank)
-	err := row.Scan(&lastYearScore)
+	err := row.Scan(&rankScore)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			lastYearScore = 0
+			// 如果没有找到精确位次，查询附近的位次
+			nearbyQuery := `
+			SELECT lowest_points FROM gaokao.admission_data 
+			WHERE year = 2024 AND lowest_rank > 0
+			ORDER BY ABS(lowest_rank - ?)
+			LIMIT 1
+			`
+			row = db.conn.QueryRow(context.Background(), nearbyQuery, rank)
+			err = row.Scan(&rankScore)
+			if err != nil {
+				rankScore = 500 // 默认分数
+			}
 		} else {
 			return nil, err
 		}
 	}
 
-	// 计算分数范围：去年等位分上+20分，下减30分
-	upperScore := lastYearScore + 20
-	lowerScore := lastYearScore - 30
+	// 计算分数范围：在位次对应分数基础上，上浮+20分，下浮-30分
+	upperScore := rankScore + 20
+	lowerScore := rankScore - 30
 	if lowerScore < 0 {
 		lowerScore = 0
 	}
@@ -198,7 +291,7 @@ func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSi
 
 	// 查询总数
 	countQuery := fmt.Sprintf(`
-	SELECT COUNT(*) FROM admission_data 
+	SELECT COUNT(*) FROM gaokao.admission_data 
 	WHERE year = 2024 
 	AND lowest_points BETWEEN ? AND ? 
 	%s
@@ -216,7 +309,7 @@ func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSi
 	dataQuery := fmt.Sprintf(`
 	SELECT id, college_code, college_name, special_interest_group_code, 
 		   professional_name, class_demand, lowest_points, lowest_rank, description
-	FROM admission_data 
+	FROM gaokao.admission_data 
 	WHERE year = 2024 
 	AND lowest_points BETWEEN ? AND ? 
 	%s
@@ -233,7 +326,7 @@ func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSi
 	var list []models.List
 	for rows.Next() {
 		var item models.List
-		var id int64
+		var id uint64
 		var collegeCode, collegeName, groupCode, profName, classDemand, desc string
 		var lowestPoints, lowestRank int64
 
@@ -283,15 +376,18 @@ func buildClassCondition(classComb string) string {
 	// 移除引号
 	classComb = strings.Trim(classComb, "\"")
 
+	// 调试输出
+	log.Printf("处理选科组合: %s", classComb)
+
 	// 物理、化学、生物、政治、历史、地理
 	// 1     2     3     4     5     6
 	subjectMap := map[string]string{
-		"1": "物理",
-		"2": "化学",
-		"3": "生物",
-		"4": "政治",
-		"5": "历史",
-		"6": "地理",
+		"1": "物",
+		"2": "化",
+		"3": "生",
+		"4": "政",
+		"5": "历",
+		"6": "地",
 	}
 
 	var subjects []string
@@ -305,11 +401,27 @@ func buildClassCondition(classComb string) string {
 		return ""
 	}
 
+	log.Printf("选择科目: %v", subjects)
+
 	// 构建SQL条件，选科要求包含用户选的科目或者不限
 	var conditions []string
 	for _, subject := range subjects {
 		conditions = append(conditions, fmt.Sprintf("class_demand LIKE '%%%s%%'", subject))
 	}
 
-	return fmt.Sprintf("AND (class_demand = '不限' OR %s)", strings.Join(conditions, " OR "))
+	// 添加不限选项
+	conditions = append(conditions, "class_demand = '不限'", "class_demand = ''")
+
+	return fmt.Sprintf("AND (%s)", strings.Join(conditions, " OR "))
+}
+
+// 获取数据记录数
+func (db *ClickHouseDB) GetDataCount() (int64, error) {
+	var count int64
+	row := db.conn.QueryRow(context.Background(), "SELECT count() FROM gaokao.admission_data")
+	err := row.Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

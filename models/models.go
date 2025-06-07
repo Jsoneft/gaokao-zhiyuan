@@ -2,17 +2,20 @@ package models
 
 // 录取数据表结构
 type AdmissionData struct {
-	ID                       int64   `json:"id" ch:"id"`                                           // 自增ID
-	Year                     int     `json:"year" ch:"year"`                                       // 年份
-	Province                 string  `json:"province" ch:"province"`                               // 省份
-	CollegeName              string  `json:"college_name" ch:"college_name"`                       // 院校名称
-	CollegeCode              string  `json:"college_code" ch:"college_code"`                       // 院校代码
-	SpecialInterestGroupCode string  `json:"special_interest_group_code" ch:"special_interest_group_code"` // 专业组代码
-	ProfessionalName         string  `json:"professional_name" ch:"professional_name"`             // 专业名称
-	ClassDemand              string  `json:"class_demand" ch:"class_demand"`                       // 选科要求
-	LowestPoints             int64   `json:"lowest_points" ch:"lowest_points"`                     // 录取最低分
-	LowestRank               int64   `json:"lowest_rank" ch:"lowest_rank"`                         // 录取最低位次
-	Description              string  `json:"description" ch:"description"`                         // 备注
+	ID                       int64  `json:"id" ch:"id"`                                                   // 自增ID
+	Year                     int    `json:"year" ch:"year"`                                               // 年份
+	Province                 string `json:"province" ch:"province"`                                       // 省份
+	Batch                    string `json:"batch" ch:"batch"`                                             // 批次
+	SubjectType              string `json:"subject_type" ch:"subject_type"`                               // 科类
+	ClassDemand              string `json:"class_demand" ch:"class_demand"`                               // 选科要求
+	CollegeCode              string `json:"college_code" ch:"college_code"`                               // 院校代码
+	SpecialInterestGroupCode string `json:"special_interest_group_code" ch:"special_interest_group_code"` // 专业组代码
+	CollegeName              string `json:"college_name" ch:"college_name"`                               // 院校名称
+	ProfessionalCode         string `json:"professional_code" ch:"professional_code"`                     // 专业代码
+	ProfessionalName         string `json:"professional_name" ch:"professional_name"`                     // 专业名称
+	LowestPoints             int64  `json:"lowest_points" ch:"lowest_points"`                             // 录取最低分
+	LowestRank               int64  `json:"lowest_rank" ch:"lowest_rank"`                                 // 录取最低位次
+	Description              string `json:"description" ch:"description"`                                 // 备注
 }
 
 // API响应结构
@@ -41,7 +44,7 @@ type List struct {
 	ColledgeCode             *string `json:"colledge_code,omitempty"`
 	ColledgeName             *string `json:"colledge_name,omitempty"`
 	Description              *string `json:"description,omitempty"`
-	ID                       *int64  `json:"id,omitempty"`
+	ID                       *uint64 `json:"id,omitempty"`
 	LowestPoints             *int64  `json:"lowest_points,omitempty"`
 	LowestRank               *int64  `json:"lowest_rank,omitempty"`
 	ProfessionalName         string  `json:"professional_name"`
@@ -50,8 +53,8 @@ type List struct {
 
 // 位次查询结果
 type RankResponse struct {
-	Code int64 `json:"code"`
+	Code int64  `json:"code"`
 	Msg  string `json:"msg"`
-	Rank int64 `json:"rank"`
-	Year int   `json:"year"`
-} 
+	Rank int64  `json:"rank"`
+	Year int    `json:"year"`
+}
