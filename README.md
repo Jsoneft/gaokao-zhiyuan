@@ -11,6 +11,55 @@
 - 请确保在项目根目录有 `21-24各省份录取数据(含专业组代码).xlsx` 文件
 - 详细的数据文件获取和设置说明请参考：[DATA_SETUP.md](DATA_SETUP.md)
 
+## 💻 Windows用户特别说明
+
+### 🪟 Windows下的快速开始
+
+如果你在Windows环境下，无需安装make工具，可以直接使用我们提供的PowerShell脚本：
+
+```powershell
+# 1. 首先安装Go环境
+winget install GoLang.Go
+
+# 2. 环境设置向导（检查环境和依赖）
+.\run.ps1 setup
+
+# 3. 下载依赖
+.\run.ps1 deps
+
+# 4. 编译项目
+.\run.ps1 build
+
+# 5. 导入数据（需要Excel文件和ClickHouse数据库）
+.\run.ps1 import
+
+# 6. 启动服务
+.\run.ps1 run
+
+# 7. 健康检查
+.\run.ps1 health
+```
+
+### 🛠️ Windows管理命令
+
+```powershell
+# 查看所有可用命令
+.\run.ps1 help
+
+# 常用命令
+.\run.ps1 build      # 编译项目
+.\run.ps1 run        # 启动服务器
+.\run.ps1 import     # 导入Excel数据
+.\run.ps1 clean      # 清理编译文件
+.\run.ps1 test       # 运行测试
+.\run.ps1 fmt        # 格式化代码
+.\run.ps1 deps       # 下载依赖
+.\run.ps1 setup      # 环境设置向导
+.\run.ps1 health     # API健康检查
+```
+
+详细的Windows环境设置请参考：[WINDOWS_SETUP.md](WINDOWS_SETUP.md)
+
 ## 系统功能
 
 用户输入自己的分数、位次、以及选课组合，系统返回个性化的院校-专业组推荐清单。
@@ -133,6 +182,8 @@ GET /api/health
 
 ### 2. 本地开发
 
+#### Linux/macOS用户：
+
 ```bash
 # 克隆项目
 git clone <repository-url>
@@ -158,7 +209,37 @@ make import
 make run
 ```
 
-### 3. 一键部署到远程服务器
+#### Windows用户：
+
+```powershell
+# 克隆项目
+git clone <repository-url>
+cd gaokao-zhiyuan
+
+# ⚠️ 重要：准备数据文件
+# 请确保 21-24各省份录取数据(含专业组代码).xlsx 文件存在于项目根目录
+# 如果没有此文件，请参考 DATA_SETUP.md 获取
+
+# 安装Go环境
+winget install GoLang.Go
+
+# 环境设置向导
+.\run.ps1 setup
+
+# 下载依赖
+.\run.ps1 deps
+
+# 编译项目
+.\run.ps1 build
+
+# 导入Excel数据
+.\run.ps1 import
+
+# 启动服务
+.\run.ps1 run
+```
+
+### 3. 一键部署到远程服务器（Linux/macOS）
 
 ```bash
 # ⚠️ 部署前确保数据文件已准备好
@@ -214,6 +295,8 @@ export CLICKHOUSE_DATABASE=gaokao   # 数据库名称
 
 ## 管理命令
 
+### Linux/macOS用户
+
 查看所有可用命令：
 ```bash
 make help
@@ -227,6 +310,23 @@ make import    # 导入数据
 make clean     # 清理编译文件
 make test      # 运行测试
 make fmt       # 格式化代码
+```
+
+### Windows用户
+
+查看所有可用命令：
+```powershell
+.\run.ps1 help
+```
+
+常用命令：
+```powershell
+.\run.ps1 build     # 编译项目
+.\run.ps1 run       # 运行服务
+.\run.ps1 import    # 导入数据
+.\run.ps1 clean     # 清理编译文件
+.\run.ps1 test      # 运行测试
+.\run.ps1 fmt       # 格式化代码
 ```
 
 ## 服务管理
@@ -301,6 +401,7 @@ ORDER BY (year, lowest_points, lowest_rank)
 
 ## 相关文档
 
+- [Windows环境设置指南](WINDOWS_SETUP.md) - Windows下的完整设置和使用指南
 - [数据文件设置说明](DATA_SETUP.md) - 如何获取和配置Excel数据文件
 - [部署指南](DEPLOYMENT.md) - 详细的部署步骤和故障排除
 

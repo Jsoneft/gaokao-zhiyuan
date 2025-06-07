@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"gaokao-zhiyuan/database"
-	"gaokao-zhiyuan/models"
+	_ "gaokao-zhiyuan/models"
 
 	"github.com/gin-gonic/gin"
 )

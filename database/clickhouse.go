@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 
 	"gaokao-zhiyuan/config"
@@ -20,6 +19,7 @@ type ClickHouseDB struct {
 }
 
 func NewClickHouseDB(cfg *config.Config) (*ClickHouseDB, error) {
+	// 先尝试连接到指定数据库
 	conn, err := clickhouse.Open(&clickhouse.Options{
 		Addr: []string{fmt.Sprintf("%s:%d", cfg.ClickHouseHost, cfg.ClickHousePort)},
 		Auth: clickhouse.Auth{
@@ -33,7 +33,44 @@ func NewClickHouseDB(cfg *config.Config) (*ClickHouseDB, error) {
 	}
 
 	if err := conn.Ping(context.Background()); err != nil {
-		return nil, err
+		// 如果连接失败，可能是数据库不存在，尝试连接默认数据库并创建
+		conn.Close()
+
+		// 连接到默认数据库
+		defaultConn, err := clickhouse.Open(&clickhouse.Options{
+			Addr: []string{fmt.Sprintf("%s:%d", cfg.ClickHouseHost, cfg.ClickHousePort)},
+			Auth: clickhouse.Auth{
+				Username: cfg.ClickHouseUser,
+				Password: cfg.ClickHousePassword,
+			},
+		})
+		if err != nil {
+			return nil, fmt.Errorf("连接默认数据库失败: %v", err)
+		}
+
+		// 创建目标数据库
+		if err := defaultConn.Exec(context.Background(), fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", cfg.ClickHouseDatabase)); err != nil {
+			defaultConn.Close()
+			return nil, fmt.Errorf("创建数据库失败: %v", err)
+		}
+		defaultConn.Close()
+
+		// 重新连接到目标数据库
+		conn, err = clickhouse.Open(&clickhouse.Options{
+			Addr: []string{fmt.Sprintf("%s:%d", cfg.ClickHouseHost, cfg.ClickHousePort)},
+			Auth: clickhouse.Auth{
+				Database: cfg.ClickHouseDatabase,
+				Username: cfg.ClickHouseUser,
+				Password: cfg.ClickHousePassword,
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		if err := conn.Ping(context.Background()); err != nil {
+			return nil, err
+		}
 	}
 
 	return &ClickHouseDB{conn: conn}, nil
@@ -66,7 +103,7 @@ func (db *ClickHouseDB) CreateTable() error {
 
 // 批量插入数据
 func (db *ClickHouseDB) BatchInsert(data []models.AdmissionData) error {
-	batch, err := db.conn.PrepareBatch(context.Background(), 
+	batch, err := db.conn.PrepareBatch(context.Background(),
 		"INSERT INTO admission_data (id, year, province, college_name, college_code, special_interest_group_code, professional_name, class_demand, lowest_points, lowest_rank, description)")
 	if err != nil {
 		return err
@@ -98,7 +135,7 @@ func (db *ClickHouseDB) BatchInsert(data []models.AdmissionData) error {
 func (db *ClickHouseDB) GetRankByScore(score int64) (*models.RankResponse, error) {
 	var rank int64
 	var year int
-	
+
 	// 查询2024年数据中对应分数的位次
 	query := `
 	SELECT lowest_rank, year FROM admission_data 
@@ -106,10 +143,10 @@ func (db *ClickHouseDB) GetRankByScore(score int64) (*models.RankResponse, error
 	ORDER BY lowest_points DESC 
 	LIMIT 1
 	`
-	
+
 	row := db.conn.QueryRow(context.Background(), query, score)
 	err := row.Scan(&rank, &year)
-	
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return &models.RankResponse{
@@ -138,7 +175,7 @@ func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSi
 	ORDER BY lowest_rank ASC 
 	LIMIT 1
 	`
-	
+
 	row := db.conn.QueryRow(context.Background(), scoreQuery, rank)
 	err := row.Scan(&lastYearScore)
 	if err != nil {
@@ -158,7 +195,7 @@ func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSi
 
 	// 构建选科条件
 	classCondition := buildClassCondition(classComb)
-	
+
 	// 查询总数
 	countQuery := fmt.Sprintf(`
 	SELECT COUNT(*) FROM admission_data 
@@ -166,7 +203,7 @@ func (db *ClickHouseDB) GetReportData(rank int64, classComb string, page, pageSi
 	AND lowest_points BETWEEN ? AND ? 
 	%s
 	`, classCondition)
-	
+
 	var totalCount int64
 	row = db.conn.QueryRow(context.Background(), countQuery, lowerScore, upperScore)
 	row.Scan(&totalCount)
@@ -245,12 +282,12 @@ func buildClassCondition(classComb string) string {
 
 	// 移除引号
 	classComb = strings.Trim(classComb, "\"")
-	
+
 	// 物理、化学、生物、政治、历史、地理
 	// 1     2     3     4     5     6
 	subjectMap := map[string]string{
 		"1": "物理",
-		"2": "化学", 
+		"2": "化学",
 		"3": "生物",
 		"4": "政治",
 		"5": "历史",
@@ -273,6 +310,6 @@ func buildClassCondition(classComb string) string {
 	for _, subject := range subjects {
 		conditions = append(conditions, fmt.Sprintf("class_demand LIKE '%%%s%%'", subject))
 	}
-	
+
 	return fmt.Sprintf("AND (class_demand = '不限' OR %s)", strings.Join(conditions, " OR "))
-} 
+}
