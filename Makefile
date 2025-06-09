@@ -29,6 +29,13 @@ build:
 	go build -o bin/import-tool tools/import_excel.go
 	@echo "编译完成！"
 
+# 编译为 Linux 平台
+build-linux:
+	@echo "为 Linux 平台编译主程序..."
+	GOOS=linux GOARCH=amd64 go build -o bin/gaokao-server-linux main.go
+	@echo "Linux 平台编译完成！"
+
+
 # 运行服务器
 run: build
 	@echo "启动服务器..."
