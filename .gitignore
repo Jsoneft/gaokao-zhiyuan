@@ -50,7 +50,7 @@ Desktop.ini
 # 数据文件（Excel文件太大，超过GitHub限制）
 *.xlsx
 *.xls
-21-24各省份录取数据(含专业组代码).xlsx
+frpc.*
 
 # 构建目录
 /build/
