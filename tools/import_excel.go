@@ -42,8 +42,8 @@ func main() {
 	count, err := db.GetDataCount()
 	if err != nil {
 		log.Fatalf("获取数据数量失败: %v", err)
-	}
+				}
 
 	log.Printf("数据导入完成，共导入 %d 条记录", count)
 	log.Println("请运行 make run 启动服务器测试查询功能")
-}
+		}
