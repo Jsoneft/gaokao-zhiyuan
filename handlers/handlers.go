@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -20,7 +21,7 @@ func NewHandler(db *database.ClickHouseDB) *Handler {
 	return &Handler{db: db}
 }
 
-// 查询位次接口
+// 查询位次接口 - 使用新的数据源
 // GET /api/rank/get?score=555
 func (h *Handler) GetRank(c *gin.Context) {
 	scoreStr := c.Query("score")
@@ -32,7 +33,7 @@ func (h *Handler) GetRank(c *gin.Context) {
 		return
 	}
 
-	score, err := strconv.ParseInt(scoreStr, 10, 64)
+	score, err := strconv.ParseFloat(scoreStr, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": 1,
@@ -41,12 +42,8 @@ func (h *Handler) GetRank(c *gin.Context) {
 		return
 	}
 
-	// 使用默认参数
-	province := "湖北"
-	year := 2024
-
-	// 直接根据分数查询位次，不指定科类和选科限制
-	rank, err := h.db.QueryRankByScoreSimple(province, year, float64(score))
+	// 使用新的查询方法
+	rank, err := h.db.QueryRankByScoreNew(score)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": 1,
@@ -59,7 +56,7 @@ func (h *Handler) GetRank(c *gin.Context) {
 		"code":  0,
 		"msg":   "success",
 		"rank":  rank,
-		"year":  year,
+		"year":  2024,
 		"score": score,
 	})
 }
@@ -117,16 +114,21 @@ func (h *Handler) QueryRank(c *gin.Context) {
 	})
 }
 
-// 报表查询接口
-// GET /api/report/get?rank=12000&class_comb="123"&page=1&page_size=20&province=湖北
+// 报表查询接口 - 新版本
+// GET /api/report/get?rank=333&class_first_choise=物理&class_optional_choise=["化学","生物"]&province=湖北&page=1&page_size=10&college_location=["湖北"]&interest=["理科","工科"]&strategy=0
 func (h *Handler) GetReport(c *gin.Context) {
 	// 获取参数
 	rankStr := c.Query("rank")
-	classComb := c.Query("class_comb")
-	pageStr := c.DefaultQuery("page", "1")
-	pageSizeStr := c.DefaultQuery("page_size", "20")
+	classFirstChoice := c.Query("class_first_choise")
+	classOptionalChoiceStr := c.Query("class_optional_choise")
 	province := c.Query("province")
+	pageStr := c.DefaultQuery("page", "1")
+	pageSizeStr := c.DefaultQuery("page_size", "10")
+	collegeLocationStr := c.Query("college_location")
+	interestStr := c.Query("interest")
+	strategyStr := c.DefaultQuery("strategy", "0")
 
+	// 参数验证
 	if rankStr == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": 1,
@@ -151,13 +153,44 @@ func (h *Handler) GetReport(c *gin.Context) {
 
 	pageSize, err := strconv.ParseInt(pageSizeStr, 10, 64)
 	if err != nil || pageSize < 1 || pageSize > 100 {
-		pageSize = 20
+		pageSize = 10
 	}
 
-	log.Printf("报表查询请求: 位次=%d, 选科=%s, 页码=%d, 每页条数=%d, 省份=%s",
-		rank, classComb, page, pageSize, province)
+	strategy, err := strconv.Atoi(strategyStr)
+	if err != nil {
+		strategy = 0
+	}
 
-	result, err := h.db.GetReportData(rank, classComb, province, page, pageSize)
+	// 解析JSON数组参数
+	var classOptionalChoice []string
+	if classOptionalChoiceStr != "" {
+		if err := json.Unmarshal([]byte(classOptionalChoiceStr), &classOptionalChoice); err != nil {
+			log.Printf("解析class_optional_choise参数失败: %v", err)
+			classOptionalChoice = []string{}
+		}
+	}
+
+	var collegeLocation []string
+	if collegeLocationStr != "" {
+		if err := json.Unmarshal([]byte(collegeLocationStr), &collegeLocation); err != nil {
+			log.Printf("解析college_location参数失败: %v", err)
+			collegeLocation = []string{}
+		}
+	}
+
+	var interest []string
+	if interestStr != "" {
+		if err := json.Unmarshal([]byte(interestStr), &interest); err != nil {
+			log.Printf("解析interest参数失败: %v", err)
+			interest = []string{}
+		}
+	}
+
+	log.Printf("报表查询请求: rank=%d, classFirstChoice=%s, classOptionalChoice=%v, province=%s, page=%d, pageSize=%d, collegeLocation=%v, interest=%v, strategy=%d",
+		rank, classFirstChoice, classOptionalChoice, province, page, pageSize, collegeLocation, interest, strategy)
+
+	// 使用新的查询方法
+	result, err := h.db.GetReportDataNew(rank, classFirstChoice, classOptionalChoice, province, page, pageSize, collegeLocation, interest, strategy)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": 1,

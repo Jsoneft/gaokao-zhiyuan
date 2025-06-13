@@ -7,10 +7,10 @@ import (
 
 type Config struct {
 	Port               string
-	GinMode           string
-	ClickHouseHost    string
-	ClickHousePort    int
-	ClickHouseUser    string
+	GinMode            string
+	ClickHouseHost     string
+	ClickHousePort     int
+	ClickHouseUser     string
 	ClickHousePassword string
 	ClickHouseDatabase string
 }
@@ -18,15 +18,15 @@ type Config struct {
 func LoadConfig() *Config {
 	port := getEnv("PORT", "8031")
 	ginMode := getEnv("GIN_MODE", "release")
-	
-	clickhousePort, _ := strconv.Atoi(getEnv("CLICKHOUSE_PORT", "9000"))
-	
+
+	clickhousePort, _ := strconv.Atoi(getEnv("CLICKHOUSE_PORT", "19000"))
+
 	return &Config{
 		Port:               port,
-		GinMode:           ginMode,
-		ClickHouseHost:    getEnv("CLICKHOUSE_HOST", "localhost"),
-		ClickHousePort:    clickhousePort,
-		ClickHouseUser:    getEnv("CLICKHOUSE_USERNAME", "default"),
+		GinMode:            ginMode,
+		ClickHouseHost:     getEnv("CLICKHOUSE_HOST", "localhost"),
+		ClickHousePort:     clickhousePort,
+		ClickHouseUser:     getEnv("CLICKHOUSE_USERNAME", "default"),
 		ClickHousePassword: getEnv("CLICKHOUSE_PASSWORD", ""),
 		ClickHouseDatabase: getEnv("CLICKHOUSE_DATABASE", "gaokao"),
 	}
@@ -37,4 +37,4 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
-} 
+}
