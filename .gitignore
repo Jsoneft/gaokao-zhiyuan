@@ -67,3 +67,12 @@ debug
 # go.sum 
 # 学制信息Excel文件
 最新最新21-24各省本科专业分 1.xlsx
+
+# 部署脚本（包含服务器敏感信息）
+deploy_remote.sh
+deploy_summary.sh
+
+# 编译后的二进制文件
+gaokao-zhiyuan-linux
+gaokao-zhiyuan-updated
+gaokao-zhiyuan-linux-updated
