@@ -495,7 +495,7 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 			   subject_requirement_raw, school_province, school_city, 
 			   school_ownership, school_type, school_authority, school_level, 
 			   school_tags, education_level, major_description, tuition_fee, is_new_major,
-			   min_score_2024, min_rank_2024, major_name, study_years
+			   min_score_2024, min_rank_2024, major_name, study_years, major_min_score_2024
 		FROM default.admission_hubei_wide_2024 
 		%s
 		ORDER BY min_score_2024 DESC
@@ -524,11 +524,12 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 		var minScore uint16
 		var minRank uint32
 		var studyYears sql.NullString
+		var majorMinScore *uint16
 
 		err := rows.Scan(&id, &schoolName, &schoolCode, &groupCode, &subjectReq,
 			&schoolProvince, &schoolCity, &schoolOwnership, &schoolType, &schoolAuthority,
 			&schoolLevel, &schoolTags, &educationLevel, &majorDesc, &tuitionFee, &isNewMajor,
-			&minScore, &minRank, &majorName, &studyYears)
+			&minScore, &minRank, &majorName, &studyYears, &majorMinScore)
 		if err != nil {
 			log.Printf("扫描行数据错误: %v", err)
 			continue
@@ -539,6 +540,9 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 		if studyYears.Valid {
 			studyYearsPtr = &studyYears.String
 		}
+
+		// 处理专业最低分字段 - 直接使用扫描出的指针
+		var majorMinScorePtr *uint16 = majorMinScore
 
 		// 转换数据类型 - 确保类型匹配
 		idUint64 := uint64(id)
@@ -566,6 +570,7 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 			LowestRank:               &lowestRankInt64,
 			ProfessionalName:         majorName,
 			StudyYears:               studyYearsPtr,
+			MajorMinScore2024:        majorMinScorePtr,
 		}
 		list = append(list, item)
 	}
