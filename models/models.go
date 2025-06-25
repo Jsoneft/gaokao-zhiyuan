@@ -58,6 +58,7 @@ type AdmissionData struct {
 	LowestPoints             int64  `json:"lowest_points" ch:"lowest_points"`                             // 录取最低分
 	LowestRank               int64  `json:"lowest_rank" ch:"lowest_rank"`                                 // 录取最低位次
 	Description              string `json:"description" ch:"description"`                                 // 备注
+	StudyYears               string `json:"study_years,omitempty" ch:"study_years"`                       // 学制
 }
 
 // API响应结构
@@ -84,17 +85,17 @@ type Conf struct {
 // 新的报表响应结构
 type List struct {
 	ID                       *uint64 `json:"id,omitempty"`
-	ColledgeName             *string `json:"colledge_name,omitempty"`
-	ColledgeCode             *string `json:"colledge_code,omitempty"`
+	CollegeName              *string `json:"college_name,omitempty"`
+	CollegeCode              *string `json:"college_code,omitempty"`
 	SpecialInterestGroupCode *string `json:"special_interest_group_code,omitempty"`
 	ClassDemand              *string `json:"class_demand,omitempty"`
-	ColledgeProvince         *string `json:"colledge_province,omitempty"`
-	ColledgeCity             *string `json:"colledge_city,omitempty"`
-	ColledgeOwnership        *string `json:"colledge_ownership,omitempty"`
-	ColledgeType             *string `json:"colledge_type,omitempty"`
-	ColledgeAuthority        *string `json:"colledge_authority,omitempty"`
-	ColledgeLevel            *string `json:"colledge_level,omitempty"`
-	ColledgeTags             *string `json:"colledge_tags,omitempty"`
+	CollegeProvince          *string `json:"college_province,omitempty"`
+	CollegeCity              *string `json:"college_city,omitempty"`
+	CollegeOwnership         *string `json:"college_ownership,omitempty"`
+	CollegeType              *string `json:"college_type,omitempty"`
+	CollegeAuthority         *string `json:"college_authority,omitempty"`
+	CollegeLevel             *string `json:"college_level,omitempty"`
+	CollegeTags              *string `json:"college_tags,omitempty"`
 	EducationLevel           *string `json:"education_level,omitempty"`
 	MajorDescription         *string `json:"major_description,omitempty"`
 	TuitionFee               *uint32 `json:"tuition_fee,omitempty"`
@@ -104,6 +105,7 @@ type List struct {
 	LowestPoints     *int64  `json:"lowest_points,omitempty"`
 	LowestRank       *int64  `json:"lowest_rank,omitempty"`
 	ProfessionalName string  `json:"professional_name"`
+	StudyYears       *string `json:"study_years,omitempty"`
 }
 
 // 位次查询结果

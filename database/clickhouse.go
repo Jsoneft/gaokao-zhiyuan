@@ -340,42 +340,45 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 		rank, classFirstChoice, classOptionalChoice, province, page, pageSize, collegeLocation, interest, strategy)
 
 	// 根据位次查询对应分数
-	var rankScore uint16
+	var rankScoreUint16 uint16
 	scoreQuery := `
 		SELECT min_score_2024 
-		FROM admission_hubei_wide_2024 
+		FROM default.admission_hubei_wide_2024 
 		WHERE min_rank_2024 <= ? AND min_rank_2024 > 0
 		ORDER BY min_rank_2024 DESC 
 		LIMIT 1
 	`
 
 	row := db.conn.QueryRow(context.Background(), scoreQuery, rank)
-	err := row.Scan(&rankScore)
+	err := row.Scan(&rankScoreUint16)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// 如果没有找到精确位次，查询附近的位次
 			nearbyQuery := `
 				SELECT min_score_2024 
-				FROM admission_hubei_wide_2024 
+				FROM default.admission_hubei_wide_2024 
 				WHERE min_rank_2024 > 0
 				ORDER BY ABS(min_rank_2024 - ?)
 				LIMIT 1
 			`
 			row = db.conn.QueryRow(context.Background(), nearbyQuery, rank)
-			err = row.Scan(&rankScore)
+			err = row.Scan(&rankScoreUint16)
 			if err != nil {
 				log.Printf("无法找到位次 %d 附近的数据，使用默认分数 500", rank)
-				rankScore = 500 // 默认分数
+				rankScoreUint16 = 500 // 默认分数
 			} else {
-				log.Printf("找到位次 %d 附近的数据，对应分数为 %d", rank, rankScore)
+				log.Printf("找到位次 %d 附近的数据，对应分数为 %d", rank, rankScoreUint16)
 			}
 		} else {
 			log.Printf("查询位次 %d 对应分数时出错: %v", rank, err)
 			return nil, err
 		}
 	} else {
-		log.Printf("位次 %d 对应的分数为 %d", rank, rankScore)
+		log.Printf("位次 %d 对应的分数为 %d", rank, rankScoreUint16)
 	}
+
+	// 转换为int64供后续计算使用
+	rankScore := int64(rankScoreUint16)
 
 	// 构建查询条件
 	var conditions []string
@@ -408,27 +411,46 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 	}
 
 	// 4. 四次筛选：分数（省生源地排位）筛选 - 冲稳保策略
-	var upperScore, lowerScore uint16
+	var upperScore, lowerScore int64
+	var minScoreDiff, maxScoreDiff int64
+
 	switch strategy {
-	case 0: // 冲稳保混合
-		upperScore = rankScore + 20 // 冲：+10~20分
-		lowerScore = rankScore - 20 // 保：-10~20分
-	case 1: // 冲
-		upperScore = rankScore + 20
-		lowerScore = rankScore + 10
-	case 2: // 稳
-		upperScore = rankScore + 10
-		lowerScore = rankScore - 10
-	case 3: // 保
-		upperScore = rankScore - 10
-		lowerScore = rankScore - 20
-	default:
-		upperScore = rankScore + 20
-		lowerScore = rankScore - 20
+	case 0: // 冲
+		minScoreDiff = 3  // 分数比最低分高3分
+		maxScoreDiff = 20 // 分数比最低分高20分
+	case 1: // 稳
+		minScoreDiff = -5 // 分数比最低分低5分
+		maxScoreDiff = 3  // 分数比最低分高3分
+	case 2: // 保
+		minScoreDiff = -20 // 分数比最低分低20分
+		maxScoreDiff = -5  // 分数比最低分低5分
+	default: // 冲稳保混合
+		minScoreDiff = -20 // 从保到冲的完整范围
+		maxScoreDiff = 20
 	}
 
-	if lowerScore > rankScore { // 防止下溢
-		lowerScore = 0
+	// 计算实际分数范围
+	lowerScore = rankScore
+	upperScore = rankScore
+
+	if minScoreDiff >= 0 {
+		lowerScore = rankScore + minScoreDiff
+	} else {
+		if -minScoreDiff <= rankScore {
+			lowerScore = rankScore - (-minScoreDiff)
+		} else {
+			lowerScore = 0 // 防止下溢
+		}
+	}
+
+	if maxScoreDiff >= 0 {
+		upperScore = rankScore + maxScoreDiff
+	} else {
+		if -maxScoreDiff <= rankScore {
+			upperScore = rankScore - (-maxScoreDiff)
+		} else {
+			upperScore = 0 // 防止下溢
+		}
 	}
 
 	conditions = append(conditions, fmt.Sprintf("min_score_2024 BETWEEN $%d AND $%d", argIndex, argIndex+1))
@@ -436,15 +458,17 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 	argIndex += 2
 
 	// 构建WHERE子句
-	whereClause := ""
+	var whereClause string
 	if len(conditions) > 0 {
 		whereClause = "WHERE " + strings.Join(conditions, " AND ")
+	} else {
+		whereClause = ""
 	}
 
 	// 查询总数
 	countQuery := fmt.Sprintf(`
 		SELECT COUNT(*) AS total_count 
-		FROM admission_hubei_wide_2024 
+		FROM default.admission_hubei_wide_2024 
 		%s
 	`, whereClause)
 
@@ -471,8 +495,8 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 			   subject_requirement_raw, school_province, school_city, 
 			   school_ownership, school_type, school_authority, school_level, 
 			   school_tags, education_level, major_description, tuition_fee, is_new_major,
-			   min_score_2024, min_rank_2024, major_name
-		FROM admission_hubei_wide_2024 
+			   min_score_2024, min_rank_2024, major_name, study_years
+		FROM default.admission_hubei_wide_2024 
 		%s
 		ORDER BY min_score_2024 DESC
 		LIMIT $%d OFFSET $%d
@@ -499,41 +523,49 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 		var isNewMajor bool
 		var minScore uint16
 		var minRank uint32
+		var studyYears sql.NullString
 
 		err := rows.Scan(&id, &schoolName, &schoolCode, &groupCode, &subjectReq,
 			&schoolProvince, &schoolCity, &schoolOwnership, &schoolType, &schoolAuthority,
 			&schoolLevel, &schoolTags, &educationLevel, &majorDesc, &tuitionFee, &isNewMajor,
-			&minScore, &minRank, &majorName)
+			&minScore, &minRank, &majorName, &studyYears)
 		if err != nil {
 			log.Printf("扫描行数据错误: %v", err)
 			continue
 		}
 
-		// 转换数据类型
+		// 处理学制字段
+		var studyYearsPtr *string
+		if studyYears.Valid {
+			studyYearsPtr = &studyYears.String
+		}
+
+		// 转换数据类型 - 确保类型匹配
 		idUint64 := uint64(id)
-		lowestPoints := int64(minScore)
-		lowestRank := int64(minRank)
+		lowestPointsInt64 := int64(minScore)
+		lowestRankInt64 := int64(minRank)
 
 		item = models.List{
 			ID:                       &idUint64,
-			ColledgeName:             &schoolName,
-			ColledgeCode:             &schoolCode,
+			CollegeName:              &schoolName,
+			CollegeCode:              &schoolCode,
 			SpecialInterestGroupCode: &groupCode,
 			ClassDemand:              &subjectReq,
-			ColledgeProvince:         &schoolProvince,
-			ColledgeCity:             &schoolCity,
-			ColledgeOwnership:        &schoolOwnership,
-			ColledgeType:             &schoolType,
-			ColledgeAuthority:        &schoolAuthority,
-			ColledgeLevel:            &schoolLevel,
-			ColledgeTags:             &schoolTags,
+			CollegeProvince:          &schoolProvince,
+			CollegeCity:              &schoolCity,
+			CollegeOwnership:         &schoolOwnership,
+			CollegeType:              &schoolType,
+			CollegeAuthority:         &schoolAuthority,
+			CollegeLevel:             &schoolLevel,
+			CollegeTags:              &schoolTags,
 			EducationLevel:           &educationLevel,
 			MajorDescription:         &majorDesc,
 			TuitionFee:               &tuitionFee,
 			IsNewMajor:               &isNewMajor,
-			LowestPoints:             &lowestPoints,
-			LowestRank:               &lowestRank,
+			LowestPoints:             &lowestPointsInt64,
+			LowestRank:               &lowestRankInt64,
 			ProfessionalName:         majorName,
+			StudyYears:               studyYearsPtr,
 		}
 		list = append(list, item)
 	}
@@ -560,46 +592,24 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 func (db *ClickHouseDB) buildSubjectConditions(classFirstChoice string, classOptionalChoice []string) string {
 	var conditions []string
 
-	// 首选科目条件
+	// 首选科目条件 - 使用subject_category字段匹配
 	if classFirstChoice == "物理" {
 		conditions = append(conditions, "subject_category = '物理'")
 	} else if classFirstChoice == "历史" {
 		conditions = append(conditions, "subject_category = '历史'")
 	}
 
-	// 可选科目条件 - 简化逻辑：用户选择的科目能够满足专业要求
+	// 可选科目条件 - 基于subject_requirement_raw字段进行模糊匹配
 	if len(classOptionalChoice) > 0 {
-		// 解析可选科目
-		subjectMap := map[string]string{
-			"化学": "require_chemistry",
-			"生物": "require_biology",
-			"政治": "require_politics",
-			"历史": "require_history",
-			"地理": "require_geography",
-		}
-
-		// 用户没有选择的科目，专业不能要求
-		userSelectedSubjects := make(map[string]bool)
-		for _, subject := range classOptionalChoice {
-			userSelectedSubjects[subject] = true
-		}
-
 		var subjectConditions []string
-		allSubjects := []string{"化学", "生物", "政治", "历史", "地理"}
-		for _, subject := range allSubjects {
-			if field, exists := subjectMap[subject]; exists {
-				if userSelectedSubjects[subject] {
-					// 用户选择了这个科目，专业可以要求也可以不要求
-					// 不添加限制条件
-				} else {
-					// 用户没有选择这个科目，专业不能要求
-					subjectConditions = append(subjectConditions, fmt.Sprintf("%s = false", field))
-				}
-			}
+		for _, subject := range classOptionalChoice {
+			// 检查选科要求中是否包含该科目
+			subjectConditions = append(subjectConditions, fmt.Sprintf("subject_requirement_raw LIKE '%%%s%%'", subject))
 		}
 
 		if len(subjectConditions) > 0 {
-			conditions = append(conditions, "("+strings.Join(subjectConditions, " AND ")+")")
+			// 至少匹配一个科目
+			conditions = append(conditions, "("+strings.Join(subjectConditions, " OR ")+")")
 		}
 	}
 
@@ -611,20 +621,26 @@ func (db *ClickHouseDB) buildSubjectConditions(classFirstChoice string, classOpt
 
 // 构建专业兴趣条件
 func (db *ClickHouseDB) buildInterestConditions(interests []string) string {
-	interestMap := map[string]string{
-		"理科":     "is_science = true",
-		"工科":     "is_engineering = true",
-		"文科":     "is_liberal_arts = true",
-		"经管法":    "is_economics_mgmt_law = true",
-		"医科":     "is_medical = true",
-		"设计与艺术类": "is_design_arts = true",
-		"语言类":    "is_language = true",
+	interestMap := map[string][]string{
+		"理科":     {"数学", "物理", "化学", "生物", "天文", "地理", "统计"},
+		"工科":     {"工程", "机械", "电子", "计算机", "软件", "土木", "建筑", "材料"},
+		"文科":     {"文学", "历史", "哲学", "语言", "新闻", "传播", "艺术"},
+		"经管法":    {"经济", "管理", "商务", "金融", "法学", "法律", "会计"},
+		"医科":     {"医学", "临床", "护理", "药学", "中医", "口腔"},
+		"设计与艺术类": {"设计", "艺术", "美术", "音乐", "舞蹈", "戏剧"},
+		"语言类":    {"英语", "日语", "法语", "德语", "俄语", "西班牙语", "阿拉伯语"},
 	}
 
 	var conditions []string
 	for _, interest := range interests {
-		if condition, exists := interestMap[interest]; exists {
-			conditions = append(conditions, condition)
+		if keywords, exists := interestMap[interest]; exists {
+			var keywordConditions []string
+			for _, keyword := range keywords {
+				keywordConditions = append(keywordConditions, fmt.Sprintf("major_name LIKE '%%%s%%'", keyword))
+			}
+			if len(keywordConditions) > 0 {
+				conditions = append(conditions, "("+strings.Join(keywordConditions, " OR ")+")")
+			}
 		}
 	}
 
@@ -754,8 +770,8 @@ func (db *ClickHouseDB) GetReportData(rank int64, classComb string, province str
 
 		item = models.List{
 			ID:                       &id,
-			ColledgeCode:             &collegeCode,
-			ColledgeName:             &collegeName,
+			CollegeCode:              &collegeCode,
+			CollegeName:              &collegeName,
 			SpecialInterestGroupCode: &groupCode,
 			ProfessionalName:         profName,
 			ClassDemand:              &classDemand,
