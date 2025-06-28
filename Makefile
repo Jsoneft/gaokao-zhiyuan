@@ -26,12 +26,6 @@ bin:
 build: bin
 	@echo "编译主程序..."
 	go build -o bin/gaokao-server main.go
-	@echo "编译导入工具..."
-	go build -o bin/import-tool tools/import_excel.go
-	@echo "编译导出工具..."
-	go build -o bin/export-tool tools/export_clickhouse.go
-	@echo "编译统计工具..."
-	go build -o bin/stats-tool tools/clickhouse_stats.go
 	@echo "编译完成！"
 
 # 运行服务器

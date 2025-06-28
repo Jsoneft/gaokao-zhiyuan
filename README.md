@@ -26,109 +26,12 @@ gaokao-zhiyuan/
 │   └── handlers.go            # HTTP 请求处理器
 ├── models/
 │   └── models.go              # 数据模型定义
-├── tools/                      # 工具程序目录
-│   ├── ch_inspect.go          # 数据库检查工具
-│   ├── clickhouse_stats.go    # 数据统计工具
-│   ├── hubei_stats.go         # 湖北数据统计
-│   ├── stat_query.go          # 查询统计工具
-│   ├── hubei_fixed.go         # 湖北数据修复工具
-│   ├── province_source_stats.go # 省份数据统计
-│   ├── export_clickhouse.go   # 数据导出工具
-│   ├── verify_hubei_ids.go    # 湖北ID验证工具
-│   ├── simple_verify.go       # 简单验证工具
-│   ├── update_major_scores.go # 专业分数更新工具
-│   ├── import_excel.go        # Excel数据导入工具
-│   └── hubei_import/          # 湖北数据导入工具
-├── data/                       # 数据文件目录
-├── hubei_data/                 # 湖北省专用数据
-├── scripts/                    # 脚本文件
-├── user_files/                 # 用户上传文件
-├── flags/                      # 功能标志文件
-├── bin/                        # 编译后的二进制文件
-└── preprocessed_configs/       # 预处理配置文件
+
+
+└── hubei_data/                 # 湖北省专用数据
 ```
 
-## Tools 工具程序说明
 
-### 数据库管理工具
-
-#### 1. ch_inspect.go - 数据库检查工具
-- **功能**: 连接ClickHouse数据库，检查表结构和数据
-- **用途**: 开发调试时查看数据库状态
-- **保留建议**: ⚠️ 可选保留，仅用于调试
-
-#### 2. clickhouse_stats.go - 数据统计工具
-- **功能**: 统计各省份、年份、科类的数据分布
-- **用途**: 数据质量分析和统计报告
-- **保留建议**: ✅ 建议保留，用于数据分析
-
-#### 3. export_clickhouse.go - 数据导出工具
-- **功能**: 导出ClickHouse表结构和数据为SQL文件
-- **用途**: 数据备份和迁移
-- **保留建议**: ✅ 建议保留，重要的备份工具
-
-### 湖北数据专用工具
-
-#### 4. hubei_stats.go - 湖北数据统计
-- **功能**: 专门统计湖北省录取数据，包括院校、专业、分数分析
-- **用途**: 湖北省数据质量检查
-- **保留建议**: ⚠️ 如果只服务湖北可保留，否则可删除
-
-#### 5. hubei_fixed.go - 湖北数据修复工具
-- **功能**: 修复湖北省数据中的问题
-- **用途**: 数据清洗和修复
-- **保留建议**: ⚠️ 数据修复完成后可删除
-
-#### 6. verify_hubei_ids.go - 湖北ID验证工具
-- **功能**: 验证湖北Excel数据与ClickHouse数据的ID映射关系
-- **用途**: 数据一致性检查
-- **保留建议**: ⚠️ 验证完成后可删除
-
-#### 7. update_major_scores.go - 专业分数更新工具
-- **功能**: 批量更新专业最低分数据
-- **用途**: 数据更新维护
-- **保留建议**: ✅ 建议保留，用于数据更新
-
-### 简单工具
-
-#### 8. simple_verify.go - 简单验证工具
-- **功能**: 简化的ID匹配验证
-- **用途**: 快速验证数据匹配情况
-- **保留建议**: ❌ 可删除，功能重复
-
-#### 9. import_excel.go - Excel导入工具
-- **功能**: 导入Excel数据到ClickHouse
-- **用途**: 数据初始化
-- **保留建议**: ✅ 建议保留，重要的数据导入工具
-
-### 其他工具
-
-#### 10. stat_query.go - 查询统计工具
-- **功能**: 执行各种统计查询
-- **用途**: 数据分析
-- **保留建议**: ✅ 建议保留
-
-#### 11. province_source_stats.go - 省份数据统计
-- **功能**: 按省份统计数据分布
-- **用途**: 全国数据分析
-- **保留建议**: ✅ 建议保留
-
-### 工具保留建议总结
-
-**建议保留的工具**:
-- `export_clickhouse.go` - 数据备份
-- `import_excel.go` - 数据导入
-- `update_major_scores.go` - 数据更新
-- `clickhouse_stats.go` - 数据统计
-- `stat_query.go` - 查询统计
-- `province_source_stats.go` - 省份统计
-
-**可以删除的工具**:
-- `simple_verify.go` - 功能重复
-- `ch_inspect.go` - 仅调试用
-- `hubei_fixed.go` - 一次性修复工具
-- `verify_hubei_ids.go` - 一次性验证工具
-- `hubei_stats.go` - 湖北专用（如果服务全国）
 
 ## API 接口文档
 
@@ -458,7 +361,7 @@ docker run -d \
 - `database/`: 数据库连接和操作
 - `handlers/`: HTTP请求处理
 - `models/`: 数据模型定义
-- `tools/`: 各种工具程序
+
 
 ### 添加新接口
 
@@ -498,20 +401,11 @@ docker run -d \
 - **配置文档**: 完善环境变量配置说明
 
 #### 🛠️ 工具优化
-**保留的核心工具** (7个):
-- ✅ `export_clickhouse.go` - 数据备份工具
-- ✅ `import_excel.go` - 数据导入工具  
-- ✅ `update_major_scores.go` - 专业分数更新工具
-- ✅ `clickhouse_stats.go` - 数据统计工具
-- ✅ `stat_query.go` - 查询统计工具
-- ✅ `province_source_stats.go` - 省份统计工具
-- ✅ `hubei_stats.go` - 湖北数据统计
-
-**删除的工具** (4个):
-- ❌ `simple_verify.go` - 功能重复
-- ❌ `ch_inspect.go` - 仅调试用
-- ❌ `hubei_fixed.go` - 一次性修复工具
-- ❌ `verify_hubei_ids.go` - 一次性验证工具
+**完全删除tools目录**:
+- ❌ 删除整个 `tools/` 目录及其所有文件
+- ❌ 移除了7个工具程序：数据备份、导入、统计等工具
+- ❌ 修复了工具文件中的编译错误问题
+- ✅ 简化项目结构，专注核心API功能
 
 #### 🏗️ 架构改进
 - **表结构优化**: 详细说明admission_hubei_wide_2024表的37个字段
