@@ -115,6 +115,7 @@ func (db *ClickHouseDB) CreateTable() error {
 		is_new_major            Bool,
 		min_score_2024          UInt16,
 		min_rank_2024           UInt32,
+		major_min_score_2024    Nullable(UInt16),
 		enrollment_plan_2024    UInt16,
 		is_science              Bool,
 		is_engineering          Bool,
@@ -544,6 +545,16 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 		// 处理专业最低分字段 - 直接使用扫描出的指针
 		var majorMinScorePtr *uint16 = majorMinScore
 
+		// 计算专业最低分对应的2024年排名
+		var majorMinRank2024Ptr *int
+		if majorMinScore != nil && *majorMinScore > 0 {
+			// 直接使用用户选择的首选科目类型
+			subjectType := classFirstChoice
+			// 使用专业最低分计算2024年排名
+			rank2024 := GetRankByScore2024(int(*majorMinScore), subjectType)
+			majorMinRank2024Ptr = &rank2024
+		}
+
 		// 转换数据类型 - 确保类型匹配
 		idUint64 := uint64(id)
 		lowestPointsInt64 := int64(minScore)
@@ -571,6 +582,7 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 			ProfessionalName:         majorName,
 			StudyYears:               studyYearsPtr,
 			MajorMinScore2024:        majorMinScorePtr,
+			MajorMinRank2024:         majorMinRank2024Ptr,
 		}
 		list = append(list, item)
 	}

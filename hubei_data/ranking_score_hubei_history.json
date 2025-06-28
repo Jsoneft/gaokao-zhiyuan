@@ -1,0 +1,2609 @@
+{
+    "data": [
+      {
+        "score": "670-750",
+        "num": 9,
+        "accumulate": 9
+      },
+      {
+        "score": "669",
+        "num": 1,
+        "accumulate": 10
+      },
+      {
+        "score": "668",
+        "num": 2,
+        "accumulate": 12
+      },
+      {
+        "score": "667",
+        "num": 0,
+        "accumulate": 12
+      },
+      {
+        "score": "666",
+        "num": 3,
+        "accumulate": 15
+      },
+      {
+        "score": "665",
+        "num": 3,
+        "accumulate": 18
+      },
+      {
+        "score": "664",
+        "num": 3,
+        "accumulate": 21
+      },
+      {
+        "score": "663",
+        "num": 2,
+        "accumulate": 23
+      },
+      {
+        "score": "662",
+        "num": 1,
+        "accumulate": 24
+      },
+      {
+        "score": "661",
+        "num": 6,
+        "accumulate": 30
+      },
+      {
+        "score": "660",
+        "num": 5,
+        "accumulate": 35
+      },
+      {
+        "score": "659",
+        "num": 1,
+        "accumulate": 36
+      },
+      {
+        "score": "658",
+        "num": 3,
+        "accumulate": 39
+      },
+      {
+        "score": "657",
+        "num": 6,
+        "accumulate": 45
+      },
+      {
+        "score": "656",
+        "num": 5,
+        "accumulate": 50
+      },
+      {
+        "score": "655",
+        "num": 5,
+        "accumulate": 55
+      },
+      {
+        "score": "654",
+        "num": 4,
+        "accumulate": 59
+      },
+      {
+        "score": "653",
+        "num": 8,
+        "accumulate": 67
+      },
+      {
+        "score": "652",
+        "num": 10,
+        "accumulate": 77
+      },
+      {
+        "score": "651",
+        "num": 9,
+        "accumulate": 86
+      },
+      {
+        "score": "650",
+        "num": 11,
+        "accumulate": 97
+      },
+      {
+        "score": "649",
+        "num": 5,
+        "accumulate": 102
+      },
+      {
+        "score": "648",
+        "num": 12,
+        "accumulate": 114
+      },
+      {
+        "score": "647",
+        "num": 14,
+        "accumulate": 128
+      },
+      {
+        "score": "646",
+        "num": 15,
+        "accumulate": 143
+      },
+      {
+        "score": "645",
+        "num": 14,
+        "accumulate": 157
+      },
+      {
+        "score": "644",
+        "num": 19,
+        "accumulate": 176
+      },
+      {
+        "score": "643",
+        "num": 13,
+        "accumulate": 189
+      },
+      {
+        "score": "642",
+        "num": 14,
+        "accumulate": 203
+      },
+      {
+        "score": "641",
+        "num": 11,
+        "accumulate": 214
+      },
+      {
+        "score": "640",
+        "num": 13,
+        "accumulate": 227
+      },
+      {
+        "score": "639",
+        "num": 18,
+        "accumulate": 245
+      },
+      {
+        "score": "638",
+        "num": 25,
+        "accumulate": 270
+      },
+      {
+        "score": "637",
+        "num": 23,
+        "accumulate": 293
+      },
+      {
+        "score": "636",
+        "num": 24,
+        "accumulate": 317
+      },
+      {
+        "score": "635",
+        "num": 21,
+        "accumulate": 338
+      },
+      {
+        "score": "634",
+        "num": 27,
+        "accumulate": 365
+      },
+      {
+        "score": "633",
+        "num": 28,
+        "accumulate": 393
+      },
+      {
+        "score": "632",
+        "num": 27,
+        "accumulate": 420
+      },
+      {
+        "score": "631",
+        "num": 17,
+        "accumulate": 437
+      },
+      {
+        "score": "630",
+        "num": 26,
+        "accumulate": 463
+      },
+      {
+        "score": "629",
+        "num": 33,
+        "accumulate": 496
+      },
+      {
+        "score": "628",
+        "num": 37,
+        "accumulate": 533
+      },
+      {
+        "score": "627",
+        "num": 38,
+        "accumulate": 571
+      },
+      {
+        "score": "626",
+        "num": 43,
+        "accumulate": 614
+      },
+      {
+        "score": "625",
+        "num": 41,
+        "accumulate": 655
+      },
+      {
+        "score": "624",
+        "num": 43,
+        "accumulate": 698
+      },
+      {
+        "score": "623",
+        "num": 49,
+        "accumulate": 747
+      },
+      {
+        "score": "622",
+        "num": 32,
+        "accumulate": 779
+      },
+      {
+        "score": "621",
+        "num": 37,
+        "accumulate": 816
+      },
+      {
+        "score": "620",
+        "num": 39,
+        "accumulate": 855
+      },
+      {
+        "score": "619",
+        "num": 53,
+        "accumulate": 908
+      },
+      {
+        "score": "618",
+        "num": 52,
+        "accumulate": 960
+      },
+      {
+        "score": "617",
+        "num": 42,
+        "accumulate": 1002
+      },
+      {
+        "score": "616",
+        "num": 59,
+        "accumulate": 1061
+      },
+      {
+        "score": "615",
+        "num": 50,
+        "accumulate": 1111
+      },
+      {
+        "score": "614",
+        "num": 53,
+        "accumulate": 1164
+      },
+      {
+        "score": "613",
+        "num": 60,
+        "accumulate": 1224
+      },
+      {
+        "score": "612",
+        "num": 61,
+        "accumulate": 1285
+      },
+      {
+        "score": "611",
+        "num": 63,
+        "accumulate": 1348
+      },
+      {
+        "score": "610",
+        "num": 52,
+        "accumulate": 1400
+      },
+      {
+        "score": "609",
+        "num": 73,
+        "accumulate": 1473
+      },
+      {
+        "score": "608",
+        "num": 60,
+        "accumulate": 1533
+      },
+      {
+        "score": "607",
+        "num": 69,
+        "accumulate": 1602
+      },
+      {
+        "score": "606",
+        "num": 93,
+        "accumulate": 1695
+      },
+      {
+        "score": "605",
+        "num": 78,
+        "accumulate": 1773
+      },
+      {
+        "score": "604",
+        "num": 80,
+        "accumulate": 1853
+      },
+      {
+        "score": "603",
+        "num": 77,
+        "accumulate": 1930
+      },
+      {
+        "score": "602",
+        "num": 72,
+        "accumulate": 2002
+      },
+      {
+        "score": "601",
+        "num": 80,
+        "accumulate": 2082
+      },
+      {
+        "score": "600",
+        "num": 94,
+        "accumulate": 2176
+      },
+      {
+        "score": "599",
+        "num": 83,
+        "accumulate": 2259
+      },
+      {
+        "score": "598",
+        "num": 92,
+        "accumulate": 2351
+      },
+      {
+        "score": "597",
+        "num": 86,
+        "accumulate": 2437
+      },
+      {
+        "score": "596",
+        "num": 105,
+        "accumulate": 2542
+      },
+      {
+        "score": "595",
+        "num": 101,
+        "accumulate": 2643
+      },
+      {
+        "score": "594",
+        "num": 97,
+        "accumulate": 2740
+      },
+      {
+        "score": "593",
+        "num": 104,
+        "accumulate": 2844
+      },
+      {
+        "score": "592",
+        "num": 107,
+        "accumulate": 2951
+      },
+      {
+        "score": "591",
+        "num": 92,
+        "accumulate": 3043
+      },
+      {
+        "score": "590",
+        "num": 118,
+        "accumulate": 3161
+      },
+      {
+        "score": "589",
+        "num": 118,
+        "accumulate": 3279
+      },
+      {
+        "score": "588",
+        "num": 116,
+        "accumulate": 3395
+      },
+      {
+        "score": "587",
+        "num": 113,
+        "accumulate": 3508
+      },
+      {
+        "score": "586",
+        "num": 108,
+        "accumulate": 3616
+      },
+      {
+        "score": "585",
+        "num": 132,
+        "accumulate": 3748
+      },
+      {
+        "score": "584",
+        "num": 136,
+        "accumulate": 3884
+      },
+      {
+        "score": "583",
+        "num": 128,
+        "accumulate": 4012
+      },
+      {
+        "score": "582",
+        "num": 108,
+        "accumulate": 4120
+      },
+      {
+        "score": "581",
+        "num": 112,
+        "accumulate": 4232
+      },
+      {
+        "score": "580",
+        "num": 129,
+        "accumulate": 4361
+      },
+      {
+        "score": "579",
+        "num": 142,
+        "accumulate": 4503
+      },
+      {
+        "score": "578",
+        "num": 149,
+        "accumulate": 4652
+      },
+      {
+        "score": "577",
+        "num": 137,
+        "accumulate": 4789
+      },
+      {
+        "score": "576",
+        "num": 134,
+        "accumulate": 4923
+      },
+      {
+        "score": "575",
+        "num": 136,
+        "accumulate": 5059
+      },
+      {
+        "score": "574",
+        "num": 134,
+        "accumulate": 5193
+      },
+      {
+        "score": "573",
+        "num": 139,
+        "accumulate": 5332
+      },
+      {
+        "score": "572",
+        "num": 162,
+        "accumulate": 5494
+      },
+      {
+        "score": "571",
+        "num": 150,
+        "accumulate": 5644
+      },
+      {
+        "score": "570",
+        "num": 153,
+        "accumulate": 5797
+      },
+      {
+        "score": "569",
+        "num": 176,
+        "accumulate": 5973
+      },
+      {
+        "score": "568",
+        "num": 186,
+        "accumulate": 6159
+      },
+      {
+        "score": "567",
+        "num": 165,
+        "accumulate": 6324
+      },
+      {
+        "score": "566",
+        "num": 165,
+        "accumulate": 6489
+      },
+      {
+        "score": "565",
+        "num": 154,
+        "accumulate": 6643
+      },
+      {
+        "score": "564",
+        "num": 173,
+        "accumulate": 6816
+      },
+      {
+        "score": "563",
+        "num": 179,
+        "accumulate": 6995
+      },
+      {
+        "score": "562",
+        "num": 153,
+        "accumulate": 7148
+      },
+      {
+        "score": "561",
+        "num": 174,
+        "accumulate": 7322
+      },
+      {
+        "score": "560",
+        "num": 186,
+        "accumulate": 7508
+      },
+      {
+        "score": "559",
+        "num": 185,
+        "accumulate": 7693
+      },
+      {
+        "score": "558",
+        "num": 178,
+        "accumulate": 7871
+      },
+      {
+        "score": "557",
+        "num": 196,
+        "accumulate": 8067
+      },
+      {
+        "score": "556",
+        "num": 173,
+        "accumulate": 8240
+      },
+      {
+        "score": "555",
+        "num": 181,
+        "accumulate": 8421
+      },
+      {
+        "score": "554",
+        "num": 197,
+        "accumulate": 8618
+      },
+      {
+        "score": "553",
+        "num": 173,
+        "accumulate": 8791
+      },
+      {
+        "score": "552",
+        "num": 209,
+        "accumulate": 9000
+      },
+      {
+        "score": "551",
+        "num": 214,
+        "accumulate": 9214
+      },
+      {
+        "score": "550",
+        "num": 212,
+        "accumulate": 9426
+      },
+      {
+        "score": "549",
+        "num": 212,
+        "accumulate": 9638
+      },
+      {
+        "score": "548",
+        "num": 180,
+        "accumulate": 9818
+      },
+      {
+        "score": "547",
+        "num": 187,
+        "accumulate": 10005
+      },
+      {
+        "score": "546",
+        "num": 224,
+        "accumulate": 10229
+      },
+      {
+        "score": "545",
+        "num": 207,
+        "accumulate": 10436
+      },
+      {
+        "score": "544",
+        "num": 234,
+        "accumulate": 10670
+      },
+      {
+        "score": "543",
+        "num": 256,
+        "accumulate": 10926
+      },
+      {
+        "score": "542",
+        "num": 228,
+        "accumulate": 11154
+      },
+      {
+        "score": "541",
+        "num": 203,
+        "accumulate": 11357
+      },
+      {
+        "score": "540",
+        "num": 205,
+        "accumulate": 11562
+      },
+      {
+        "score": "539",
+        "num": 221,
+        "accumulate": 11783
+      },
+      {
+        "score": "538",
+        "num": 225,
+        "accumulate": 12008
+      },
+      {
+        "score": "537",
+        "num": 222,
+        "accumulate": 12230
+      },
+      {
+        "score": "536",
+        "num": 246,
+        "accumulate": 12476
+      },
+      {
+        "score": "535",
+        "num": 238,
+        "accumulate": 12714
+      },
+      {
+        "score": "534",
+        "num": 231,
+        "accumulate": 12945
+      },
+      {
+        "score": "533",
+        "num": 248,
+        "accumulate": 13193
+      },
+      {
+        "score": "532",
+        "num": 225,
+        "accumulate": 13418
+      },
+      {
+        "score": "531",
+        "num": 228,
+        "accumulate": 13646
+      },
+      {
+        "score": "530",
+        "num": 236,
+        "accumulate": 13882
+      },
+      {
+        "score": "529",
+        "num": 280,
+        "accumulate": 14162
+      },
+      {
+        "score": "528",
+        "num": 269,
+        "accumulate": 14431
+      },
+      {
+        "score": "527",
+        "num": 235,
+        "accumulate": 14666
+      },
+      {
+        "score": "526",
+        "num": 251,
+        "accumulate": 14917
+      },
+      {
+        "score": "525",
+        "num": 261,
+        "accumulate": 15178
+      },
+      {
+        "score": "524",
+        "num": 283,
+        "accumulate": 15461
+      },
+      {
+        "score": "523",
+        "num": 257,
+        "accumulate": 15718
+      },
+      {
+        "score": "522",
+        "num": 267,
+        "accumulate": 15985
+      },
+      {
+        "score": "521",
+        "num": 260,
+        "accumulate": 16245
+      },
+      {
+        "score": "520",
+        "num": 241,
+        "accumulate": 16486
+      },
+      {
+        "score": "519",
+        "num": 252,
+        "accumulate": 16738
+      },
+      {
+        "score": "518",
+        "num": 264,
+        "accumulate": 17002
+      },
+      {
+        "score": "517",
+        "num": 259,
+        "accumulate": 17261
+      },
+      {
+        "score": "516",
+        "num": 233,
+        "accumulate": 17494
+      },
+      {
+        "score": "515",
+        "num": 269,
+        "accumulate": 17763
+      },
+      {
+        "score": "514",
+        "num": 250,
+        "accumulate": 18013
+      },
+      {
+        "score": "513",
+        "num": 261,
+        "accumulate": 18274
+      },
+      {
+        "score": "512",
+        "num": 276,
+        "accumulate": 18550
+      },
+      {
+        "score": "511",
+        "num": 264,
+        "accumulate": 18814
+      },
+      {
+        "score": "510",
+        "num": 268,
+        "accumulate": 19082
+      },
+      {
+        "score": "509",
+        "num": 274,
+        "accumulate": 19356
+      },
+      {
+        "score": "508",
+        "num": 274,
+        "accumulate": 19630
+      },
+      {
+        "score": "507",
+        "num": 281,
+        "accumulate": 19911
+      },
+      {
+        "score": "506",
+        "num": 289,
+        "accumulate": 20200
+      },
+      {
+        "score": "505",
+        "num": 299,
+        "accumulate": 20499
+      },
+      {
+        "score": "504",
+        "num": 288,
+        "accumulate": 20787
+      },
+      {
+        "score": "503",
+        "num": 311,
+        "accumulate": 21098
+      },
+      {
+        "score": "502",
+        "num": 269,
+        "accumulate": 21367
+      },
+      {
+        "score": "501",
+        "num": 279,
+        "accumulate": 21646
+      },
+      {
+        "score": "500",
+        "num": 309,
+        "accumulate": 21955
+      },
+      {
+        "score": "499",
+        "num": 298,
+        "accumulate": 22253
+      },
+      {
+        "score": "498",
+        "num": 273,
+        "accumulate": 22526
+      },
+      {
+        "score": "497",
+        "num": 322,
+        "accumulate": 22848
+      },
+      {
+        "score": "496",
+        "num": 265,
+        "accumulate": 23113
+      },
+      {
+        "score": "495",
+        "num": 300,
+        "accumulate": 23413
+      },
+      {
+        "score": "494",
+        "num": 311,
+        "accumulate": 23724
+      },
+      {
+        "score": "493",
+        "num": 304,
+        "accumulate": 24028
+      },
+      {
+        "score": "492",
+        "num": 300,
+        "accumulate": 24328
+      },
+      {
+        "score": "491",
+        "num": 286,
+        "accumulate": 24614
+      },
+      {
+        "score": "490",
+        "num": 309,
+        "accumulate": 24923
+      },
+      {
+        "score": "489",
+        "num": 308,
+        "accumulate": 25231
+      },
+      {
+        "score": "488",
+        "num": 285,
+        "accumulate": 25516
+      },
+      {
+        "score": "487",
+        "num": 299,
+        "accumulate": 25815
+      },
+      {
+        "score": "486",
+        "num": 289,
+        "accumulate": 26104
+      },
+      {
+        "score": "485",
+        "num": 339,
+        "accumulate": 26443
+      },
+      {
+        "score": "484",
+        "num": 290,
+        "accumulate": 26733
+      },
+      {
+        "score": "483",
+        "num": 297,
+        "accumulate": 27030
+      },
+      {
+        "score": "482",
+        "num": 340,
+        "accumulate": 27370
+      },
+      {
+        "score": "481",
+        "num": 305,
+        "accumulate": 27675
+      },
+      {
+        "score": "480",
+        "num": 325,
+        "accumulate": 28000
+      },
+      {
+        "score": "479",
+        "num": 328,
+        "accumulate": 28328
+      },
+      {
+        "score": "478",
+        "num": 326,
+        "accumulate": 28654
+      },
+      {
+        "score": "477",
+        "num": 346,
+        "accumulate": 29000
+      },
+      {
+        "score": "476",
+        "num": 295,
+        "accumulate": 29295
+      },
+      {
+        "score": "475",
+        "num": 340,
+        "accumulate": 29635
+      },
+      {
+        "score": "474",
+        "num": 316,
+        "accumulate": 29951
+      },
+      {
+        "score": "473",
+        "num": 328,
+        "accumulate": 30279
+      },
+      {
+        "score": "472",
+        "num": 360,
+        "accumulate": 30639
+      },
+      {
+        "score": "471",
+        "num": 366,
+        "accumulate": 31005
+      },
+      {
+        "score": "470",
+        "num": 321,
+        "accumulate": 31326
+      },
+      {
+        "score": "469",
+        "num": 325,
+        "accumulate": 31651
+      },
+      {
+        "score": "468",
+        "num": 373,
+        "accumulate": 32024
+      },
+      {
+        "score": "467",
+        "num": 325,
+        "accumulate": 32349
+      },
+      {
+        "score": "466",
+        "num": 321,
+        "accumulate": 32670
+      },
+      {
+        "score": "465",
+        "num": 351,
+        "accumulate": 33021
+      },
+      {
+        "score": "464",
+        "num": 334,
+        "accumulate": 33355
+      },
+      {
+        "score": "463",
+        "num": 371,
+        "accumulate": 33726
+      },
+      {
+        "score": "462",
+        "num": 372,
+        "accumulate": 34098
+      },
+      {
+        "score": "461",
+        "num": 332,
+        "accumulate": 34430
+      },
+      {
+        "score": "460",
+        "num": 329,
+        "accumulate": 34759
+      },
+      {
+        "score": "459",
+        "num": 361,
+        "accumulate": 35120
+      },
+      {
+        "score": "458",
+        "num": 349,
+        "accumulate": 35469
+      },
+      {
+        "score": "457",
+        "num": 355,
+        "accumulate": 35824
+      },
+      {
+        "score": "456",
+        "num": 345,
+        "accumulate": 36169
+      },
+      {
+        "score": "455",
+        "num": 376,
+        "accumulate": 36545
+      },
+      {
+        "score": "454",
+        "num": 364,
+        "accumulate": 36909
+      },
+      {
+        "score": "453",
+        "num": 375,
+        "accumulate": 37284
+      },
+      {
+        "score": "452",
+        "num": 383,
+        "accumulate": 37667
+      },
+      {
+        "score": "451",
+        "num": 352,
+        "accumulate": 38019
+      },
+      {
+        "score": "450",
+        "num": 398,
+        "accumulate": 38417
+      },
+      {
+        "score": "449",
+        "num": 349,
+        "accumulate": 38766
+      },
+      {
+        "score": "448",
+        "num": 361,
+        "accumulate": 39127
+      },
+      {
+        "score": "447",
+        "num": 382,
+        "accumulate": 39509
+      },
+      {
+        "score": "446",
+        "num": 341,
+        "accumulate": 39850
+      },
+      {
+        "score": "445",
+        "num": 384,
+        "accumulate": 40234
+      },
+      {
+        "score": "444",
+        "num": 383,
+        "accumulate": 40617
+      },
+      {
+        "score": "443",
+        "num": 406,
+        "accumulate": 41023
+      },
+      {
+        "score": "442",
+        "num": 386,
+        "accumulate": 41409
+      },
+      {
+        "score": "441",
+        "num": 399,
+        "accumulate": 41808
+      },
+      {
+        "score": "440",
+        "num": 364,
+        "accumulate": 42172
+      },
+      {
+        "score": "439",
+        "num": 373,
+        "accumulate": 42545
+      },
+      {
+        "score": "438",
+        "num": 398,
+        "accumulate": 42943
+      },
+      {
+        "score": "437",
+        "num": 390,
+        "accumulate": 43333
+      },
+      {
+        "score": "436",
+        "num": 378,
+        "accumulate": 43711
+      },
+      {
+        "score": "435",
+        "num": 368,
+        "accumulate": 44079
+      },
+      {
+        "score": "434",
+        "num": 388,
+        "accumulate": 44467
+      },
+      {
+        "score": "433",
+        "num": 360,
+        "accumulate": 44827
+      },
+      {
+        "score": "432",
+        "num": 398,
+        "accumulate": 45225
+      },
+      {
+        "score": "431",
+        "num": 396,
+        "accumulate": 45621
+      },
+      {
+        "score": "430",
+        "num": 402,
+        "accumulate": 46023
+      },
+      {
+        "score": "429",
+        "num": 389,
+        "accumulate": 46412
+      },
+      {
+        "score": "428",
+        "num": 391,
+        "accumulate": 46803
+      },
+      {
+        "score": "427",
+        "num": 388,
+        "accumulate": 47191
+      },
+      {
+        "score": "426",
+        "num": 410,
+        "accumulate": 47601
+      },
+      {
+        "score": "425",
+        "num": 410,
+        "accumulate": 48011
+      },
+      {
+        "score": "424",
+        "num": 368,
+        "accumulate": 48379
+      },
+      {
+        "score": "423",
+        "num": 383,
+        "accumulate": 48762
+      },
+      {
+        "score": "422",
+        "num": 407,
+        "accumulate": 49169
+      },
+      {
+        "score": "421",
+        "num": 381,
+        "accumulate": 49550
+      },
+      {
+        "score": "420",
+        "num": 401,
+        "accumulate": 49951
+      },
+      {
+        "score": "419",
+        "num": 421,
+        "accumulate": 50372
+      },
+      {
+        "score": "418",
+        "num": 422,
+        "accumulate": 50794
+      },
+      {
+        "score": "417",
+        "num": 431,
+        "accumulate": 51225
+      },
+      {
+        "score": "416",
+        "num": 403,
+        "accumulate": 51628
+      },
+      {
+        "score": "415",
+        "num": 394,
+        "accumulate": 52022
+      },
+      {
+        "score": "414",
+        "num": 379,
+        "accumulate": 52401
+      },
+      {
+        "score": "413",
+        "num": 418,
+        "accumulate": 52819
+      },
+      {
+        "score": "412",
+        "num": 440,
+        "accumulate": 53259
+      },
+      {
+        "score": "411",
+        "num": 401,
+        "accumulate": 53660
+      },
+      {
+        "score": "410",
+        "num": 406,
+        "accumulate": 54066
+      },
+      {
+        "score": "409",
+        "num": 431,
+        "accumulate": 54497
+      },
+      {
+        "score": "408",
+        "num": 426,
+        "accumulate": 54923
+      },
+      {
+        "score": "407",
+        "num": 424,
+        "accumulate": 55347
+      },
+      {
+        "score": "406",
+        "num": 396,
+        "accumulate": 55743
+      },
+      {
+        "score": "405",
+        "num": 428,
+        "accumulate": 56171
+      },
+      {
+        "score": "404",
+        "num": 412,
+        "accumulate": 56583
+      },
+      {
+        "score": "403",
+        "num": 457,
+        "accumulate": 57040
+      },
+      {
+        "score": "402",
+        "num": 443,
+        "accumulate": 57483
+      },
+      {
+        "score": "401",
+        "num": 421,
+        "accumulate": 57904
+      },
+      {
+        "score": "400",
+        "num": 417,
+        "accumulate": 58321
+      },
+      {
+        "score": "399",
+        "num": 437,
+        "accumulate": 58758
+      },
+      {
+        "score": "398",
+        "num": 468,
+        "accumulate": 59226
+      },
+      {
+        "score": "397",
+        "num": 448,
+        "accumulate": 59674
+      },
+      {
+        "score": "396",
+        "num": 437,
+        "accumulate": 60111
+      },
+      {
+        "score": "395",
+        "num": 442,
+        "accumulate": 60553
+      },
+      {
+        "score": "394",
+        "num": 422,
+        "accumulate": 60975
+      },
+      {
+        "score": "393",
+        "num": 482,
+        "accumulate": 61457
+      },
+      {
+        "score": "392",
+        "num": 456,
+        "accumulate": 61913
+      },
+      {
+        "score": "391",
+        "num": 457,
+        "accumulate": 62370
+      },
+      {
+        "score": "390",
+        "num": 456,
+        "accumulate": 62826
+      },
+      {
+        "score": "389",
+        "num": 436,
+        "accumulate": 63262
+      },
+      {
+        "score": "388",
+        "num": 461,
+        "accumulate": 63723
+      },
+      {
+        "score": "387",
+        "num": 488,
+        "accumulate": 64211
+      },
+      {
+        "score": "386",
+        "num": 495,
+        "accumulate": 64706
+      },
+      {
+        "score": "385",
+        "num": 402,
+        "accumulate": 65108
+      },
+      {
+        "score": "384",
+        "num": 482,
+        "accumulate": 65590
+      },
+      {
+        "score": "383",
+        "num": 428,
+        "accumulate": 66018
+      },
+      {
+        "score": "382",
+        "num": 422,
+        "accumulate": 66440
+      },
+      {
+        "score": "381",
+        "num": 448,
+        "accumulate": 66888
+      },
+      {
+        "score": "380",
+        "num": 470,
+        "accumulate": 67358
+      },
+      {
+        "score": "379",
+        "num": 465,
+        "accumulate": 67823
+      },
+      {
+        "score": "378",
+        "num": 422,
+        "accumulate": 68245
+      },
+      {
+        "score": "377",
+        "num": 476,
+        "accumulate": 68721
+      },
+      {
+        "score": "376",
+        "num": 474,
+        "accumulate": 69195
+      },
+      {
+        "score": "375",
+        "num": 433,
+        "accumulate": 69628
+      },
+      {
+        "score": "374",
+        "num": 469,
+        "accumulate": 70097
+      },
+      {
+        "score": "373",
+        "num": 464,
+        "accumulate": 70561
+      },
+      {
+        "score": "372",
+        "num": 450,
+        "accumulate": 71011
+      },
+      {
+        "score": "371",
+        "num": 437,
+        "accumulate": 71448
+      },
+      {
+        "score": "370",
+        "num": 452,
+        "accumulate": 71900
+      },
+      {
+        "score": "369",
+        "num": 469,
+        "accumulate": 72369
+      },
+      {
+        "score": "368",
+        "num": 486,
+        "accumulate": 72855
+      },
+      {
+        "score": "367",
+        "num": 479,
+        "accumulate": 73334
+      },
+      {
+        "score": "366",
+        "num": 475,
+        "accumulate": 73809
+      },
+      {
+        "score": "365",
+        "num": 498,
+        "accumulate": 74307
+      },
+      {
+        "score": "364",
+        "num": 484,
+        "accumulate": 74791
+      },
+      {
+        "score": "363",
+        "num": 485,
+        "accumulate": 75276
+      },
+      {
+        "score": "362",
+        "num": 479,
+        "accumulate": 75755
+      },
+      {
+        "score": "361",
+        "num": 474,
+        "accumulate": 76229
+      },
+      {
+        "score": "360",
+        "num": 435,
+        "accumulate": 76664
+      },
+      {
+        "score": "359",
+        "num": 483,
+        "accumulate": 77147
+      },
+      {
+        "score": "358",
+        "num": 430,
+        "accumulate": 77577
+      },
+      {
+        "score": "357",
+        "num": 478,
+        "accumulate": 78055
+      },
+      {
+        "score": "356",
+        "num": 464,
+        "accumulate": 78519
+      },
+      {
+        "score": "355",
+        "num": 473,
+        "accumulate": 78992
+      },
+      {
+        "score": "354",
+        "num": 487,
+        "accumulate": 79479
+      },
+      {
+        "score": "353",
+        "num": 520,
+        "accumulate": 79999
+      },
+      {
+        "score": "352",
+        "num": 483,
+        "accumulate": 80482
+      },
+      {
+        "score": "351",
+        "num": 502,
+        "accumulate": 80984
+      },
+      {
+        "score": "350",
+        "num": 478,
+        "accumulate": 81462
+      },
+      {
+        "score": "349",
+        "num": 458,
+        "accumulate": 81920
+      },
+      {
+        "score": "348",
+        "num": 456,
+        "accumulate": 82376
+      },
+      {
+        "score": "347",
+        "num": 475,
+        "accumulate": 82851
+      },
+      {
+        "score": "346",
+        "num": 464,
+        "accumulate": 83315
+      },
+      {
+        "score": "345",
+        "num": 471,
+        "accumulate": 83786
+      },
+      {
+        "score": "344",
+        "num": 486,
+        "accumulate": 84272
+      },
+      {
+        "score": "343",
+        "num": 467,
+        "accumulate": 84739
+      },
+      {
+        "score": "342",
+        "num": 463,
+        "accumulate": 85202
+      },
+      {
+        "score": "341",
+        "num": 435,
+        "accumulate": 85637
+      },
+      {
+        "score": "340",
+        "num": 460,
+        "accumulate": 86097
+      },
+      {
+        "score": "339",
+        "num": 490,
+        "accumulate": 86587
+      },
+      {
+        "score": "338",
+        "num": 511,
+        "accumulate": 87098
+      },
+      {
+        "score": "337",
+        "num": 430,
+        "accumulate": 87528
+      },
+      {
+        "score": "336",
+        "num": 468,
+        "accumulate": 87996
+      },
+      {
+        "score": "335",
+        "num": 485,
+        "accumulate": 88481
+      },
+      {
+        "score": "334",
+        "num": 450,
+        "accumulate": 88931
+      },
+      {
+        "score": "333",
+        "num": 501,
+        "accumulate": 89432
+      },
+      {
+        "score": "332",
+        "num": 492,
+        "accumulate": 89924
+      },
+      {
+        "score": "331",
+        "num": 444,
+        "accumulate": 90368
+      },
+      {
+        "score": "330",
+        "num": 449,
+        "accumulate": 90817
+      },
+      {
+        "score": "329",
+        "num": 476,
+        "accumulate": 91293
+      },
+      {
+        "score": "328",
+        "num": 422,
+        "accumulate": 91715
+      },
+      {
+        "score": "327",
+        "num": 441,
+        "accumulate": 92156
+      },
+      {
+        "score": "326",
+        "num": 465,
+        "accumulate": 92621
+      },
+      {
+        "score": "325",
+        "num": 471,
+        "accumulate": 93092
+      },
+      {
+        "score": "324",
+        "num": 462,
+        "accumulate": 93554
+      },
+      {
+        "score": "323",
+        "num": 465,
+        "accumulate": 94019
+      },
+      {
+        "score": "322",
+        "num": 439,
+        "accumulate": 94458
+      },
+      {
+        "score": "321",
+        "num": 471,
+        "accumulate": 94929
+      },
+      {
+        "score": "320",
+        "num": 435,
+        "accumulate": 95364
+      },
+      {
+        "score": "319",
+        "num": 447,
+        "accumulate": 95811
+      },
+      {
+        "score": "318",
+        "num": 443,
+        "accumulate": 96254
+      },
+      {
+        "score": "317",
+        "num": 423,
+        "accumulate": 96677
+      },
+      {
+        "score": "316",
+        "num": 421,
+        "accumulate": 97098
+      },
+      {
+        "score": "315",
+        "num": 461,
+        "accumulate": 97559
+      },
+      {
+        "score": "314",
+        "num": 420,
+        "accumulate": 97979
+      },
+      {
+        "score": "313",
+        "num": 418,
+        "accumulate": 98397
+      },
+      {
+        "score": "312",
+        "num": 439,
+        "accumulate": 98836
+      },
+      {
+        "score": "311",
+        "num": 389,
+        "accumulate": 99225
+      },
+      {
+        "score": "310",
+        "num": 423,
+        "accumulate": 99648
+      },
+      {
+        "score": "309",
+        "num": 416,
+        "accumulate": 100064
+      },
+      {
+        "score": "308",
+        "num": 394,
+        "accumulate": 100458
+      },
+      {
+        "score": "307",
+        "num": 378,
+        "accumulate": 100836
+      },
+      {
+        "score": "306",
+        "num": 400,
+        "accumulate": 101236
+      },
+      {
+        "score": "305",
+        "num": 392,
+        "accumulate": 101628
+      },
+      {
+        "score": "304",
+        "num": 392,
+        "accumulate": 102020
+      },
+      {
+        "score": "303",
+        "num": 401,
+        "accumulate": 102421
+      },
+      {
+        "score": "302",
+        "num": 417,
+        "accumulate": 102838
+      },
+      {
+        "score": "301",
+        "num": 390,
+        "accumulate": 103228
+      },
+      {
+        "score": "300",
+        "num": 379,
+        "accumulate": 103607
+      },
+      {
+        "score": "299",
+        "num": 417,
+        "accumulate": 104024
+      },
+      {
+        "score": "298",
+        "num": 359,
+        "accumulate": 104383
+      },
+      {
+        "score": "297",
+        "num": 394,
+        "accumulate": 104777
+      },
+      {
+        "score": "296",
+        "num": 346,
+        "accumulate": 105123
+      },
+      {
+        "score": "295",
+        "num": 378,
+        "accumulate": 105501
+      },
+      {
+        "score": "294",
+        "num": 362,
+        "accumulate": 105863
+      },
+      {
+        "score": "293",
+        "num": 363,
+        "accumulate": 106226
+      },
+      {
+        "score": "292",
+        "num": 343,
+        "accumulate": 106569
+      },
+      {
+        "score": "291",
+        "num": 315,
+        "accumulate": 106884
+      },
+      {
+        "score": "290",
+        "num": 333,
+        "accumulate": 107217
+      },
+      {
+        "score": "289",
+        "num": 360,
+        "accumulate": 107577
+      },
+      {
+        "score": "288",
+        "num": 342,
+        "accumulate": 107919
+      },
+      {
+        "score": "287",
+        "num": 347,
+        "accumulate": 108266
+      },
+      {
+        "score": "286",
+        "num": 331,
+        "accumulate": 108597
+      },
+      {
+        "score": "285",
+        "num": 375,
+        "accumulate": 108972
+      },
+      {
+        "score": "284",
+        "num": 313,
+        "accumulate": 109285
+      },
+      {
+        "score": "283",
+        "num": 302,
+        "accumulate": 109587
+      },
+      {
+        "score": "282",
+        "num": 335,
+        "accumulate": 109922
+      },
+      {
+        "score": "281",
+        "num": 296,
+        "accumulate": 110218
+      },
+      {
+        "score": "280",
+        "num": 329,
+        "accumulate": 110547
+      },
+      {
+        "score": "279",
+        "num": 313,
+        "accumulate": 110860
+      },
+      {
+        "score": "278",
+        "num": 315,
+        "accumulate": 111175
+      },
+      {
+        "score": "277",
+        "num": 298,
+        "accumulate": 111473
+      },
+      {
+        "score": "276",
+        "num": 313,
+        "accumulate": 111786
+      },
+      {
+        "score": "275",
+        "num": 294,
+        "accumulate": 112080
+      },
+      {
+        "score": "274",
+        "num": 286,
+        "accumulate": 112366
+      },
+      {
+        "score": "273",
+        "num": 296,
+        "accumulate": 112662
+      },
+      {
+        "score": "272",
+        "num": 253,
+        "accumulate": 112915
+      },
+      {
+        "score": "271",
+        "num": 258,
+        "accumulate": 113173
+      },
+      {
+        "score": "270",
+        "num": 287,
+        "accumulate": 113460
+      },
+      {
+        "score": "269",
+        "num": 242,
+        "accumulate": 113702
+      },
+      {
+        "score": "268",
+        "num": 262,
+        "accumulate": 113964
+      },
+      {
+        "score": "267",
+        "num": 213,
+        "accumulate": 114177
+      },
+      {
+        "score": "266",
+        "num": 259,
+        "accumulate": 114436
+      },
+      {
+        "score": "265",
+        "num": 233,
+        "accumulate": 114669
+      },
+      {
+        "score": "264",
+        "num": 226,
+        "accumulate": 114895
+      },
+      {
+        "score": "263",
+        "num": 228,
+        "accumulate": 115123
+      },
+      {
+        "score": "262",
+        "num": 238,
+        "accumulate": 115361
+      },
+      {
+        "score": "261",
+        "num": 245,
+        "accumulate": 115606
+      },
+      {
+        "score": "260",
+        "num": 220,
+        "accumulate": 115826
+      },
+      {
+        "score": "259",
+        "num": 190,
+        "accumulate": 116016
+      },
+      {
+        "score": "258",
+        "num": 220,
+        "accumulate": 116236
+      },
+      {
+        "score": "257",
+        "num": 236,
+        "accumulate": 116472
+      },
+      {
+        "score": "256",
+        "num": 232,
+        "accumulate": 116704
+      },
+      {
+        "score": "255",
+        "num": 230,
+        "accumulate": 116934
+      },
+      {
+        "score": "254",
+        "num": 190,
+        "accumulate": 117124
+      },
+      {
+        "score": "253",
+        "num": 178,
+        "accumulate": 117302
+      },
+      {
+        "score": "252",
+        "num": 188,
+        "accumulate": 117490
+      },
+      {
+        "score": "251",
+        "num": 176,
+        "accumulate": 117666
+      },
+      {
+        "score": "250",
+        "num": 159,
+        "accumulate": 117825
+      },
+      {
+        "score": "249",
+        "num": 171,
+        "accumulate": 117996
+      },
+      {
+        "score": "248",
+        "num": 174,
+        "accumulate": 118170
+      },
+      {
+        "score": "247",
+        "num": 184,
+        "accumulate": 118354
+      },
+      {
+        "score": "246",
+        "num": 157,
+        "accumulate": 118511
+      },
+      {
+        "score": "245",
+        "num": 162,
+        "accumulate": 118673
+      },
+      {
+        "score": "244",
+        "num": 162,
+        "accumulate": 118835
+      },
+      {
+        "score": "243",
+        "num": 153,
+        "accumulate": 118988
+      },
+      {
+        "score": "242",
+        "num": 148,
+        "accumulate": 119136
+      },
+      {
+        "score": "241",
+        "num": 146,
+        "accumulate": 119282
+      },
+      {
+        "score": "240",
+        "num": 157,
+        "accumulate": 119439
+      },
+      {
+        "score": "239",
+        "num": 139,
+        "accumulate": 119578
+      },
+      {
+        "score": "238",
+        "num": 153,
+        "accumulate": 119731
+      },
+      {
+        "score": "237",
+        "num": 125,
+        "accumulate": 119856
+      },
+      {
+        "score": "236",
+        "num": 157,
+        "accumulate": 120013
+      },
+      {
+        "score": "235",
+        "num": 138,
+        "accumulate": 120151
+      },
+      {
+        "score": "234",
+        "num": 150,
+        "accumulate": 120301
+      },
+      {
+        "score": "233",
+        "num": 130,
+        "accumulate": 120431
+      },
+      {
+        "score": "232",
+        "num": 129,
+        "accumulate": 120560
+      },
+      {
+        "score": "231",
+        "num": 138,
+        "accumulate": 120698
+      },
+      {
+        "score": "230",
+        "num": 132,
+        "accumulate": 120830
+      },
+      {
+        "score": "229",
+        "num": 117,
+        "accumulate": 120947
+      },
+      {
+        "score": "228",
+        "num": 113,
+        "accumulate": 121060
+      },
+      {
+        "score": "227",
+        "num": 108,
+        "accumulate": 121168
+      },
+      {
+        "score": "226",
+        "num": 121,
+        "accumulate": 121289
+      },
+      {
+        "score": "225",
+        "num": 104,
+        "accumulate": 121393
+      },
+      {
+        "score": "224",
+        "num": 109,
+        "accumulate": 121502
+      },
+      {
+        "score": "223",
+        "num": 86,
+        "accumulate": 121588
+      },
+      {
+        "score": "222",
+        "num": 112,
+        "accumulate": 121700
+      },
+      {
+        "score": "221",
+        "num": 87,
+        "accumulate": 121787
+      },
+      {
+        "score": "220",
+        "num": 85,
+        "accumulate": 121872
+      },
+      {
+        "score": "219",
+        "num": 86,
+        "accumulate": 121958
+      },
+      {
+        "score": "218",
+        "num": 89,
+        "accumulate": 122047
+      },
+      {
+        "score": "217",
+        "num": 86,
+        "accumulate": 122133
+      },
+      {
+        "score": "216",
+        "num": 85,
+        "accumulate": 122218
+      },
+      {
+        "score": "215",
+        "num": 62,
+        "accumulate": 122280
+      },
+      {
+        "score": "214",
+        "num": 75,
+        "accumulate": 122355
+      },
+      {
+        "score": "213",
+        "num": 66,
+        "accumulate": 122421
+      },
+      {
+        "score": "212",
+        "num": 64,
+        "accumulate": 122485
+      },
+      {
+        "score": "211",
+        "num": 65,
+        "accumulate": 122550
+      },
+      {
+        "score": "210",
+        "num": 63,
+        "accumulate": 122613
+      },
+      {
+        "score": "209",
+        "num": 81,
+        "accumulate": 122694
+      },
+      {
+        "score": "208",
+        "num": 80,
+        "accumulate": 122774
+      },
+      {
+        "score": "207",
+        "num": 69,
+        "accumulate": 122843
+      },
+      {
+        "score": "206",
+        "num": 49,
+        "accumulate": 122892
+      },
+      {
+        "score": "205",
+        "num": 65,
+        "accumulate": 122957
+      },
+      {
+        "score": "204",
+        "num": 50,
+        "accumulate": 123007
+      },
+      {
+        "score": "203",
+        "num": 57,
+        "accumulate": 123064
+      },
+      {
+        "score": "202",
+        "num": 57,
+        "accumulate": 123121
+      },
+      {
+        "score": "201",
+        "num": 43,
+        "accumulate": 123164
+      },
+      {
+        "score": "200",
+        "num": 37,
+        "accumulate": 123201
+      },
+      {
+        "score": "199",
+        "num": 39,
+        "accumulate": 123240
+      },
+      {
+        "score": "198",
+        "num": 43,
+        "accumulate": 123283
+      },
+      {
+        "score": "197",
+        "num": 40,
+        "accumulate": 123323
+      },
+      {
+        "score": "196",
+        "num": 45,
+        "accumulate": 123368
+      },
+      {
+        "score": "195",
+        "num": 32,
+        "accumulate": 123400
+      },
+      {
+        "score": "194",
+        "num": 24,
+        "accumulate": 123424
+      },
+      {
+        "score": "193",
+        "num": 37,
+        "accumulate": 123461
+      },
+      {
+        "score": "192",
+        "num": 44,
+        "accumulate": 123505
+      },
+      {
+        "score": "191",
+        "num": 37,
+        "accumulate": 123542
+      },
+      {
+        "score": "190",
+        "num": 26,
+        "accumulate": 123568
+      },
+      {
+        "score": "189",
+        "num": 35,
+        "accumulate": 123603
+      },
+      {
+        "score": "188",
+        "num": 38,
+        "accumulate": 123641
+      },
+      {
+        "score": "187",
+        "num": 37,
+        "accumulate": 123678
+      },
+      {
+        "score": "186",
+        "num": 30,
+        "accumulate": 123708
+      },
+      {
+        "score": "185",
+        "num": 26,
+        "accumulate": 123734
+      },
+      {
+        "score": "184",
+        "num": 24,
+        "accumulate": 123758
+      },
+      {
+        "score": "183",
+        "num": 20,
+        "accumulate": 123778
+      },
+      {
+        "score": "182",
+        "num": 21,
+        "accumulate": 123799
+      },
+      {
+        "score": "181",
+        "num": 19,
+        "accumulate": 123818
+      },
+      {
+        "score": "180",
+        "num": 16,
+        "accumulate": 123834
+      },
+      {
+        "score": "179",
+        "num": 20,
+        "accumulate": 123854
+      },
+      {
+        "score": "178",
+        "num": 25,
+        "accumulate": 123879
+      },
+      {
+        "score": "177",
+        "num": 20,
+        "accumulate": 123899
+      },
+      {
+        "score": "176",
+        "num": 13,
+        "accumulate": 123912
+      },
+      {
+        "score": "175",
+        "num": 14,
+        "accumulate": 123926
+      },
+      {
+        "score": "174",
+        "num": 25,
+        "accumulate": 123951
+      },
+      {
+        "score": "173",
+        "num": 17,
+        "accumulate": 123968
+      },
+      {
+        "score": "172",
+        "num": 16,
+        "accumulate": 123984
+      },
+      {
+        "score": "171",
+        "num": 7,
+        "accumulate": 123991
+      },
+      {
+        "score": "170",
+        "num": 11,
+        "accumulate": 124002
+      },
+      {
+        "score": "169",
+        "num": 12,
+        "accumulate": 124014
+      },
+      {
+        "score": "168",
+        "num": 9,
+        "accumulate": 124023
+      },
+      {
+        "score": "167",
+        "num": 14,
+        "accumulate": 124037
+      },
+      {
+        "score": "166",
+        "num": 13,
+        "accumulate": 124050
+      },
+      {
+        "score": "165",
+        "num": 14,
+        "accumulate": 124064
+      },
+      {
+        "score": "164",
+        "num": 15,
+        "accumulate": 124079
+      },
+      {
+        "score": "163",
+        "num": 7,
+        "accumulate": 124086
+      },
+      {
+        "score": "162",
+        "num": 12,
+        "accumulate": 124098
+      },
+      {
+        "score": "161",
+        "num": 8,
+        "accumulate": 124106
+      },
+      {
+        "score": "160",
+        "num": 15,
+        "accumulate": 124121
+      },
+      {
+        "score": "159",
+        "num": 8,
+        "accumulate": 124129
+      },
+      {
+        "score": "158",
+        "num": 17,
+        "accumulate": 124146
+      },
+      {
+        "score": "157",
+        "num": 7,
+        "accumulate": 124153
+      },
+      {
+        "score": "156",
+        "num": 11,
+        "accumulate": 124164
+      },
+      {
+        "score": "155",
+        "num": 16,
+        "accumulate": 124180
+      },
+      {
+        "score": "154",
+        "num": 10,
+        "accumulate": 124190
+      },
+      {
+        "score": "153",
+        "num": 7,
+        "accumulate": 124197
+      },
+      {
+        "score": "152",
+        "num": 9,
+        "accumulate": 124206
+      },
+      {
+        "score": "151",
+        "num": 7,
+        "accumulate": 124213
+      },
+      {
+        "score": "150",
+        "num": 10,
+        "accumulate": 124223
+      }
+    ]
+  }

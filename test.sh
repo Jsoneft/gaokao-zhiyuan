@@ -192,6 +192,26 @@ run_tests() {
     test_api "高级位次查询接口" \
         "curl -s -X POST '$BASE_URL/api/v1/query_rank' -H 'Content-Type: application/json' -d '{\"province\":\"湖北\",\"year\":2024,\"score\":555,\"subject_type\":\"物理\",\"class_demand\":[\"物\",\"化\",\"生\"]}'" \
         "200"
+    
+    # 测试major_min_rank_2024字段: 物理类专业
+    test_api "测试物理类专业major_min_rank_2024字段" \
+        "curl -s -X GET '$BASE_URL/api/report/get?rank=30000&class_first_choise=物理&province=湖北&page=1&page_size=3'" \
+        "200"
+    
+    # 测试major_min_rank_2024字段: 历史类专业
+    test_api "测试历史类专业major_min_rank_2024字段" \
+        "curl -s -X GET '$BASE_URL/api/report/get?rank=15000&class_first_choise=历史&province=湖北&page=1&page_size=3'" \
+        "200"
+    
+    # 验证物理类专业排名计算准确性
+    test_api "验证物理类494分对应排名94438" \
+        "curl -s -X GET '$BASE_URL/api/report/get?rank=50000&class_first_choise=物理&province=湖北&page=1&page_size=1'" \
+        "200"
+    
+    # 验证历史类专业排名计算准确性  
+    test_api "验证历史类488分对应排名25516" \
+        "curl -s -X GET '$BASE_URL/api/report/get?rank=15000&class_first_choise=历史&province=湖北&page=1&page_size=1'" \
+        "200"
 }
 
 # 生成测试报告

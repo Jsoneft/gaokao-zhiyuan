@@ -83,6 +83,18 @@ type Conf struct {
 	TotalPage   int64 `json:"total_page"`
 }
 
+// 2024年一分一段表数据结构
+type ScoreRankData struct {
+	Score int `json:"score"` // 分数
+	Rank  int `json:"rank"`  // 排名
+}
+
+// 2024年湖北省一分一段表（硬编码数据）
+type ScoreRankTable2024 struct {
+	Physics []ScoreRankData `json:"physics"` // 物理类
+	History []ScoreRankData `json:"history"` // 历史类
+}
+
 // 新的报表响应结构
 type List struct {
 	ID                       *uint64 `json:"id,omitempty"`
@@ -108,6 +120,7 @@ type List struct {
 	ProfessionalName  string  `json:"professional_name"`
 	StudyYears        *string `json:"study_years,omitempty"`
 	MajorMinScore2024 *uint16 `json:"major_min_score_2024,omitempty"`
+	MajorMinRank2024  *int    `json:"major_min_rank_2024,omitempty"` // 新增字段：专业最低分对应的2024年排名
 }
 
 // 位次查询结果
