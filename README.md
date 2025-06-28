@@ -1,414 +1,349 @@
-# gaokao-zhiyuan
-高考志愿填报辅助系统
+# 高考志愿填报系统 API
 
-高考志愿填报辅助系统 - 这个系统是一个辅助中国高考考生填写高考志愿的后端API服务。
+## 项目简介
 
-## 🚨 重要提示：数据文件说明
+高考志愿填报系统是一个基于 Go 语言开发的 Web API 服务，主要提供高考分数位次查询和志愿填报建议功能。系统使用 ClickHouse 作为数据库，提供高性能的数据查询服务。
 
-**Excel数据文件未包含在仓库中**：由于 `21-24各省份录取数据(含专业组代码).xlsx` 文件大小为112MB，超过了GitHub的100MB文件大小限制，该文件已从仓库中移除。
+## 技术栈
 
-**部署前请先准备数据文件**：
-- 请确保在项目根目录有 `21-24各省份录取数据(含专业组代码).xlsx` 文件
-- 详细的数据文件获取和设置说明请参考：[DATA_SETUP.md](DATA_SETUP.md)
-
-## 💻 Windows用户特别说明
-
-### 🪟 Windows下的快速开始
-
-如果你在Windows环境下，无需安装make工具，可以直接使用我们提供的PowerShell脚本：
-
-```powershell
-# 1. 首先安装Go环境
-winget install GoLang.Go
-
-# 2. 环境设置向导（检查环境和依赖）
-.\run.ps1 setup
-
-# 3. 下载依赖
-.\run.ps1 deps
-
-# 4. 编译项目
-.\run.ps1 build
-
-# 5. 导入数据（需要Excel文件和ClickHouse数据库）
-.\run.ps1 import
-
-# 6. 启动服务
-.\run.ps1 run
-
-# 7. 健康检查
-.\run.ps1 health
-```
-
-### 🛠️ Windows管理命令
-
-```powershell
-# 查看所有可用命令
-.\run.ps1 help
-
-# 常用命令
-.\run.ps1 build      # 编译项目
-.\run.ps1 run        # 启动服务器
-.\run.ps1 import     # 导入Excel数据
-.\run.ps1 clean      # 清理编译文件
-.\run.ps1 test       # 运行测试
-.\run.ps1 fmt        # 格式化代码
-.\run.ps1 deps       # 下载依赖
-.\run.ps1 setup      # 环境设置向导
-.\run.ps1 health     # API健康检查
-```
-
-详细的Windows环境设置请参考：[WINDOWS_SETUP.md](WINDOWS_SETUP.md)
-
-## 系统功能
-
-用户输入自己的分数、位次、以及选课组合，系统返回个性化的院校-专业组推荐清单。
-
-### 交互流程
-```
-输入: 
-- 高考分数：______分
-- 全省位次：______名  
-- 选科组合：________
-
-输出:
-- 院校-专业组推荐清单（45个）
-```
-
-## 技术架构
-
-- **后端框架**: Go + Gin
+- **后端语言**: Go 1.21+
+- **Web框架**: Gin
 - **数据库**: ClickHouse
-- **数据源**: Excel文件 (`21-24各省份录取数据(含专业组代码).xlsx`)
+- **配置管理**: 环境变量 + .env 文件
 
-## 项目结构
+## 目录结构
 
 ```
 gaokao-zhiyuan/
-├── config/          # 配置管理
-├── database/        # 数据库操作
-├── handlers/        # API处理器
-├── models/          # 数据模型
-├── scripts/         # 部署脚本
-├── tools/           # 工具程序
-├── main.go          # 主程序入口
-├── Makefile         # 构建脚本
-├── README.md        # 项目说明
-├── DATA_SETUP.md    # 数据文件设置说明
-└── DEPLOYMENT.md    # 部署指南
+├── main.go                     # 主程序入口
+├── go.mod                      # Go 模块依赖
+├── go.sum                      # 依赖版本锁定
+├── config/
+│   └── config.go              # 配置管理
+├── database/
+│   └── clickhouse.go          # ClickHouse 数据库连接和操作
+├── handlers/
+│   └── handlers.go            # HTTP 请求处理器
+├── models/
+│   └── models.go              # 数据模型定义
+├── tools/                      # 工具程序
+│   ├── ch_inspect.go          # ClickHouse 数据检查工具
+│   ├── clickhouse_stats.go    # 数据统计工具
+│   ├── hubei_stats.go         # 湖北数据统计
+│   ├── stat_query.go          # 查询统计工具
+│   ├── hubei_fixed.go         # 湖北数据修复工具
+│   ├── province_source_stats.go # 省份数据统计
+│   ├── export_clickhouse.go   # 数据导出工具
+│   ├── verify_hubei_ids.go    # 湖北ID验证工具
+│   ├── simple_verify.go       # 简单验证工具
+│   ├── update_major_scores.go # 专业分数更新工具
+│   └── hubei_import/          # 湖北数据导入工具
+├── data/                       # 数据文件目录
+├── hubei_data/                 # 湖北省专用数据
+├── scripts/                    # 脚本文件
+├── user_files/                 # 用户上传文件
+├── flags/                      # 功能标志文件
+├── bin/                        # 编译后的二进制文件
+└── preprocessed_configs/       # 预处理配置文件
 ```
 
-## API接口
+## API 接口文档
 
-### 1. 位次查询接口
+### 1. 健康检查
 
-根据高考分数查询对应位次。
+**接口地址**: `GET /api/health`
 
-**请求**:
-```bash
+**功能**: 检查服务健康状态
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "服务正常运行"
+}
+```
+
+### 2. 分数位次查询
+
+**接口地址**: `GET /api/rank/get`
+
+**功能**: 根据分数查询对应的位次
+
+**请求参数**:
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| score | float | 是 | 高考分数 |
+
+**请求示例**:
+```
 GET /api/rank/get?score=555
 ```
 
-**响应**:
+**响应示例**:
 ```json
 {
-    "code": 0,
-    "msg": "success", 
-    "rank": 72387,
-    "year": 2024
+  "code": 0,
+  "msg": "success",
+  "rank": 45678,
+  "year": 2024,
+  "score": 555
 }
 ```
 
-### 2. 报表查询接口
+### 3. 高级位次查询
 
-根据位次和选科组合查询推荐院校专业。
+**接口地址**: `POST /api/v1/query_rank`
 
-**请求**:
-```bash
-GET /api/report/get?rank=12000&class_comb="123"&page=1&page_size=20
+**功能**: 根据多个条件查询位次
+
+**请求参数**:
+```json
+{
+  "province": "湖北",
+  "year": 2024,
+  "score": 555,
+  "subject_type": "物理",
+  "class_demand": ["物", "化", "生"]
+}
 ```
 
 **参数说明**:
-- `rank`: 用户位次
-- `class_comb`: 选科组合字符串
-  - 物理=1, 化学=2, 生物=3, 政治=4, 历史=5, 地理=6
-  - 例如: 物理+化学+生物 = "123"
-- `page`: 页码 (默认1)
-- `page_size`: 每页大小 (默认20)
+| 参数名 | 类型 | 必填 | 默认值 | 说明 |
+|--------|------|------|--------|------|
+| province | string | 否 | "湖北" | 省份 |
+| year | int | 否 | 2024 | 年份 |
+| score | int64 | 是 | - | 高考分数 |
+| subject_type | string | 否 | "物理" | 科目类型 |
+| class_demand | []string | 否 | ["物","化","生"] | 选科要求 |
 
-**响应**:
+**响应示例**:
 ```json
 {
-    "code": 0,
-    "msg": "success",
-    "data": {
-        "conf": {
-            "page": 1,
-            "page_size": 20,
-            "total_number": 100,
-            "total_page": 5
-        },
-        "list": [
-            {
-                "id": 1,
-                "colledge_code": "A01",
-                "colledge_name": "武汉大学", 
-                "special_interest_group_code": "01",
-                "professional_name": "计算机类",
-                "class_demand": "物理+化学",
-                "lowest_points": 625,
-                "lowest_rank": 3500,
-                "description": "国家特色专业，就业率98%"
-            }
-        ]
-    }
+  "code": 0,
+  "msg": "success",
+  "rank": 45678,
+  "year": 2024,
+  "province": "湖北",
+  "subject_type": "物理",
+  "score": 555
 }
 ```
 
-### 3. 健康检查
+### 4. 志愿填报报表查询
 
-**请求**:
-```bash
-GET /api/health
+**接口地址**: `GET /api/report/get`
+
+**功能**: 根据位次和条件查询推荐的院校专业
+
+**请求参数**:
+| 参数名 | 类型 | 必填 | 默认值 | 说明 |
+|--------|------|------|--------|------|
+| rank | int64 | 是 | - | 位次 |
+| class_first_choise | string | 否 | - | 首选科目 |
+| class_optional_choise | string | 否 | - | 可选科目(JSON数组字符串) |
+| province | string | 否 | - | 省份 |
+| page | int | 否 | 1 | 页码 |
+| page_size | int | 否 | 10 | 每页数量(最大100) |
+| college_location | string | 否 | - | 院校地区(JSON数组字符串) |
+| interest | string | 否 | - | 兴趣方向(JSON数组字符串) |
+| strategy | int | 否 | 0 | 填报策略 |
+
+**请求示例**:
+```
+GET /api/report/get?rank=50000&class_first_choise=物理&class_optional_choise=["化学","生物"]&province=湖北&page=1&page_size=10&college_location=["湖北"]&interest=["理科","工科"]&strategy=0
 ```
 
-## 快速开始
-
-### 1. 环境要求
-
-- Go 1.21+
-- ClickHouse 22.0+
-- Linux/macOS/Windows
-
-### 2. 本地开发
-
-#### Linux/macOS用户：
-
-```bash
-# 克隆项目
-git clone <repository-url>
-cd gaokao-zhiyuan
-
-# ⚠️ 重要：准备数据文件
-# 请确保 21-24各省份录取数据(含专业组代码).xlsx 文件存在于项目根目录
-# 如果没有此文件，请参考 DATA_SETUP.md 获取
-
-# 下载依赖
-make deps
-
-# 安装ClickHouse (Ubuntu/Debian)
-sudo scripts/install_clickhouse.sh
-
-# 编译项目
-make build
-
-# 导入Excel数据
-make import
-
-# 启动服务
-make run
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "conf": {
+      "page": 1,
+      "page_size": 10,
+      "total_number": 1500,
+      "total_page": 150
+    },
+    "list": [
+      {
+        "id": 12345,
+        "college_name": "华中科技大学",
+        "college_code": "10487",
+        "professional_name": "计算机科学与技术",
+        "class_demand": "物理+化学",
+        "college_province": "湖北",
+        "college_city": "武汉",
+        "college_ownership": "公办",
+        "college_type": "综合",
+        "college_authority": "教育部",
+        "college_level": "985",
+        "education_level": "本科",
+        "tuition_fee": 5850,
+        "study_years": "4",
+        "lowest_points": 580,
+        "lowest_rank": 12000,
+        "major_min_score_2024": 585,
+        "is_new_major": false
+      }
+    ]
+  }
+}
 ```
 
-#### Windows用户：
+## 配置文件结构
 
-```powershell
-# 克隆项目
-git clone <repository-url>
-cd gaokao-zhiyuan
+### 环境变量配置
 
-# ⚠️ 重要：准备数据文件
-# 请确保 21-24各省份录取数据(含专业组代码).xlsx 文件存在于项目根目录
-# 如果没有此文件，请参考 DATA_SETUP.md 获取
-
-# 安装Go环境
-winget install GoLang.Go
-
-# 环境设置向导
-.\run.ps1 setup
-
-# 下载依赖
-.\run.ps1 deps
-
-# 编译项目
-.\run.ps1 build
-
-# 导入Excel数据
-.\run.ps1 import
-
-# 启动服务
-.\run.ps1 run
-```
-
-### 3. 一键部署到远程服务器（Linux/macOS）
+系统通过环境变量进行配置，支持 `.env` 文件：
 
 ```bash
-# ⚠️ 部署前确保数据文件已准备好
-# 可以先手动上传数据文件到服务器，或修改部署脚本从远程下载
+# 服务配置
+PORT=8031                           # 服务端口
+GIN_MODE=release                    # Gin运行模式 (debug/release)
 
-# 部署到远程服务器 (需要SSH密钥认证)
-make deploy SERVER=192.168.1.100 USERNAME=root
-
-# 或指定端口
-make deploy SERVER=192.168.1.100 USERNAME=ubuntu PORT=2222
+# ClickHouse 数据库配置
+CLICKHOUSE_HOST=localhost           # ClickHouse 主机地址
+CLICKHOUSE_PORT=19000              # ClickHouse 端口
+CLICKHOUSE_USERNAME=default         # ClickHouse 用户名
+CLICKHOUSE_PASSWORD=               # ClickHouse 密码
+CLICKHOUSE_DATABASE=gaokao         # ClickHouse 数据库名
 ```
 
-**部署注意事项**：
-- 部署脚本会尝试在服务器上查找Excel数据文件
-- 如果文件不存在，请先手动上传或修改部署脚本
-- 详细说明请参考 [DEPLOYMENT.md](DEPLOYMENT.md)
+### 配置加载逻辑
 
-部署脚本会自动完成：
-- 安装Go环境
-- 安装ClickHouse
-- 编译项目
-- 导入数据
-- 配置系统服务
-- 配置防火墙
+配置通过 `config/config.go` 加载：
 
-### 4. 环境变量
+```go
+type Config struct {
+    Port               string  // 服务端口
+    GinMode            string  // Gin运行模式
+    ClickHouseHost     string  // ClickHouse主机
+    ClickHousePort     int     // ClickHouse端口
+    ClickHouseUser     string  // ClickHouse用户名
+    ClickHousePassword string  // ClickHouse密码
+    ClickHouseDatabase string  // ClickHouse数据库名
+}
+```
 
-可以通过环境变量配置服务：
+## 数据库表结构
+
+### 主要数据表
+
+#### admission_hubei_wide_2024 (湖北省录取数据表)
+
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| id | UInt32 | 记录ID |
+| school_code | String | 学校代码 |
+| school_name | String | 学校名称 |
+| major_code | String | 专业代码 |
+| major_name | String | 专业名称 |
+| major_group_code | String | 专业组代码 |
+| source_province | String | 生源省份 |
+| school_province | String | 学校省份 |
+| school_city | String | 学校城市 |
+| admission_batch | String | 录取批次 |
+| subject_category | Enum8 | 科目类别('物理'=1, '历史'=2) |
+| require_physics | Bool | 是否要求物理 |
+| require_chemistry | Bool | 是否要求化学 |
+| require_biology | Bool | 是否要求生物 |
+| require_politics | Bool | 是否要求政治 |
+| require_history | Bool | 是否要求历史 |
+| require_geography | Bool | 是否要求地理 |
+| subject_requirement_raw | String | 原始选科要求 |
+| school_type | String | 学校类型 |
+| school_ownership | Enum8 | 学校性质('公办'=1, '民办'=2) |
+| school_authority | String | 学校主管部门 |
+| school_level | String | 学校层次 |
+| school_tags | String | 学校标签 |
+| education_level | Enum8 | 教育层次('本科'=1, '专科'=2) |
+| major_description | String | 专业描述 |
+| study_years | UInt8 | 学制年限 |
+| tuition_fee | UInt32 | 学费 |
+| is_new_major | Bool | 是否新专业 |
+| min_score_2024 | UInt16 | 2024年最低分 |
+| min_rank_2024 | UInt32 | 2024年最低位次 |
+| enrollment_plan_2024 | UInt16 | 2024年招生计划 |
+| is_science | Bool | 是否理科 |
+| is_engineering | Bool | 是否工科 |
+| is_medical | Bool | 是否医科 |
+| is_economics_mgmt_law | Bool | 是否经管法 |
+| is_liberal_arts | Bool | 是否文科 |
+| is_design_arts | Bool | 是否设计艺术 |
+| is_language | Bool | 是否语言类 |
+
+## 部署说明
+
+### 1. 环境准备
+
+- Go 1.21+ 
+- ClickHouse 数据库
+- Linux/Windows/macOS 系统
+
+### 2. 编译运行
 
 ```bash
-export PORT=8031                    # 服务端口
-export GIN_MODE=release             # Gin模式
-export CLICKHOUSE_HOST=localhost    # ClickHouse主机
-export CLICKHOUSE_PORT=9000         # ClickHouse端口  
-export CLICKHOUSE_USERNAME=default  # ClickHouse用户名
-export CLICKHOUSE_PASSWORD=         # ClickHouse密码
-export CLICKHOUSE_DATABASE=gaokao   # 数据库名称
+# 安装依赖
+go mod download
+
+# 编译
+go build -o gaokao-zhiyuan main.go
+
+# 运行
+./gaokao-zhiyuan
 ```
 
-## 业务逻辑
-
-### 位次查询逻辑
-1. 在2024年数据中按分数排序
-2. 找到用户分数对应的位置
-3. 返回对应专业的最低位次
-
-### 报表查询逻辑  
-1. 根据用户位次计算去年等位分
-2. 计算分数范围：等位分+20分 到 等位分-30分
-3. 根据选科组合过滤专业
-4. 在分数范围内查询2024年数据
-5. 按专业最低分排序返回结果
-
-## 管理命令
-
-### Linux/macOS用户
-
-查看所有可用命令：
-```bash
-make help
-```
-
-常用命令：
-```bash
-make build     # 编译项目
-make run       # 运行服务
-make import    # 导入数据
-make clean     # 清理编译文件
-make test      # 运行测试
-make fmt       # 格式化代码
-```
-
-### Windows用户
-
-查看所有可用命令：
-```powershell
-.\run.ps1 help
-```
-
-常用命令：
-```powershell
-.\run.ps1 build     # 编译项目
-.\run.ps1 run       # 运行服务
-.\run.ps1 import    # 导入数据
-.\run.ps1 clean     # 清理编译文件
-.\run.ps1 test      # 运行测试
-.\run.ps1 fmt       # 格式化代码
-```
-
-## 服务管理
-
-部署后可使用systemd管理服务：
+### 3. Docker 部署
 
 ```bash
-# 查看服务状态
-sudo systemctl status gaokao-server
+# 构建镜像
+docker build -t gaokao-zhiyuan .
 
-# 查看服务日志
-sudo journalctl -u gaokao-server -f
-
-# 重启服务
-sudo systemctl restart gaokao-server
-
-# 停止服务  
-sudo systemctl stop gaokao-server
+# 运行容器
+docker run -d \
+  -p 8031:8031 \
+  -e CLICKHOUSE_HOST=your_clickhouse_host \
+  -e CLICKHOUSE_PORT=19000 \
+  -e CLICKHOUSE_USERNAME=default \
+  -e CLICKHOUSE_PASSWORD=your_password \
+  -e CLICKHOUSE_DATABASE=gaokao \
+  gaokao-zhiyuan
 ```
 
-## 数据表结构
+## 开发说明
 
-```sql
-CREATE TABLE admission_data (
-    id UInt64,                           -- 自增ID
-    year UInt32,                         -- 年份
-    province String,                     -- 省份  
-    college_name String,                 -- 院校名称
-    college_code String,                 -- 院校代码
-    special_interest_group_code String,  -- 专业组代码
-    professional_name String,            -- 专业名称
-    class_demand String,                 -- 选科要求
-    lowest_points Int64,                 -- 录取最低分
-    lowest_rank Int64,                   -- 录取最低位次
-    description String                   -- 备注
-) ENGINE = MergeTree()
-ORDER BY (year, lowest_points, lowest_rank)
-```
+### 项目结构说明
 
-## 选科组合编码
+- `main.go`: 程序入口，设置路由和中间件
+- `config/`: 配置管理模块
+- `database/`: 数据库连接和操作
+- `handlers/`: HTTP请求处理
+- `models/`: 数据模型定义
+- `tools/`: 各种工具程序
 
-| 科目 | 编码 |
-|------|------|
-| 物理 | 1    |
-| 化学 | 2    |
-| 生物 | 3    |
-| 政治 | 4    |
-| 历史 | 5    |
-| 地理 | 6    |
+### 添加新接口
 
-示例：
-- 物理+化学+生物 = "123"
-- 历史+政治+地理 = "456"
+1. 在 `models/models.go` 中定义数据结构
+2. 在 `database/clickhouse.go` 中添加数据库操作方法
+3. 在 `handlers/handlers.go` 中添加HTTP处理方法
+4. 在 `main.go` 中添加路由
 
-## 故障排除
+### 数据库操作
 
-### 常见问题
+系统使用 ClickHouse 作为主数据库，主要操作包括：
+- 位次查询
+- 院校专业查询
+- 数据统计分析
 
-1. **连接ClickHouse失败**
-   - 检查ClickHouse服务是否运行: `sudo systemctl status clickhouse-server`
-   - 检查端口是否开放: `netstat -tlnp | grep 9000`
+## 注意事项
 
-2. **数据导入失败**
-   - 确保Excel文件存在且格式正确
-   - 检查数据库连接
-   - 查看错误日志获取详细信息
-   - 参考 [DATA_SETUP.md](DATA_SETUP.md) 解决数据文件问题
-
-3. **API响应慢**
-   - 检查ClickHouse查询性能
-   - 考虑添加索引或优化查询语句
-
-## 相关文档
-
-- [Windows环境设置指南](WINDOWS_SETUP.md) - Windows下的完整设置和使用指南
-- [数据文件设置说明](DATA_SETUP.md) - 如何获取和配置Excel数据文件
-- [部署指南](DEPLOYMENT.md) - 详细的部署步骤和故障排除
+1. **环境变量**: 确保所有必要的环境变量都已正确设置
+2. **数据库连接**: 确保 ClickHouse 服务正常运行且可访问
+3. **端口配置**: 确保配置的端口未被占用
+4. **数据安全**: 不要在代码中硬编码密码等敏感信息
+5. **性能优化**: 大数据量查询时注意分页和索引优化
 
 ## 许可证
 
-[MIT License](LICENSE)
-
----
-
-如有问题请提交Issue或联系维护者。
+本项目采用 MIT 许可证，详见 LICENSE 文件。

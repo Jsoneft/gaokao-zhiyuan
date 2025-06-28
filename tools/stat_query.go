@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
 )
@@ -15,7 +16,7 @@ func main() {
 		Auth: clickhouse.Auth{
 			Database: "gaokao",
 			Username: "default",
-			Password: "vfdeuiclgb",
+			Password: os.Getenv("CLICKHOUSE_PASSWORD"),
 		},
 	})
 	if err != nil {

@@ -1,3 +1,51 @@
+# 项目清理文档
+
+## 已清理的敏感信息
+
+本文档记录了项目中已清理的敏感信息，确保代码安全。
+
+## 清理内容
+
+### 1. Shell脚本文件
+- 已删除所有 .sh 文件，这些文件包含了部署脚本和密码信息
+
+### 2. 硬编码密码
+- 已将所有硬编码的数据库密码改为环境变量读取
+- 已将所有硬编码的SSH密码移除
+
+### 3. 配置文件
+- 确保所有配置都通过环境变量管理
+- 移除了配置文件中的明文密码
+
+## 安全建议
+
+1. **环境变量**: 使用环境变量管理所有敏感信息
+2. **访问控制**: 确保数据库和服务器有适当的访问控制
+3. **密码策略**: 使用强密码并定期更换
+4. **网络安全**: 配置防火墙和网络访问控制
+
+## 环境变量配置
+
+```bash
+# ClickHouse 配置
+export CLICKHOUSE_HOST=localhost
+export CLICKHOUSE_PORT=19000
+export CLICKHOUSE_USERNAME=default
+export CLICKHOUSE_PASSWORD=your_secure_password
+export CLICKHOUSE_DATABASE=gaokao
+
+# 服务配置
+export PORT=8031
+export GIN_MODE=release
+```
+
+## 注意事项
+
+- 不要在代码中硬编码任何密码或敏感信息
+- 使用 .env 文件进行本地开发配置
+- 确保 .env 文件已添加到 .gitignore
+- 生产环境使用系统环境变量或安全的配置管理工具
+
 # 项目清理说明
 
 本文档记录了高考志愿填报系统项目的清理过程和结果。
@@ -46,7 +94,7 @@
 - 服务器：43.248.188.28:26890
 - 数据库：gaokao
 - 用户名：default
-- 密码：vfdeuiclgb
+- 密码：已移除
 
 ## 注意事项
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/ClickHouse/clickhouse-go/v2"
 )
@@ -13,7 +14,7 @@ const (
 	ClickHouseHost     = "43.248.188.28"
 	ClickHousePort     = 26890
 	ClickHouseUser     = "default"
-	ClickHousePassword = "vfdeuiclgb"
+	ClickHousePassword = os.Getenv("CLICKHOUSE_PASSWORD")
 	ClickHouseDatabase = "gaokao"
 )
 

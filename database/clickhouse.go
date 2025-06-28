@@ -604,17 +604,39 @@ func (db *ClickHouseDB) buildSubjectConditions(classFirstChoice string, classOpt
 		conditions = append(conditions, "subject_category = '历史'")
 	}
 
-	// 可选科目条件 - 基于subject_requirement_raw字段进行模糊匹配
+	// 可选科目条件 - 简化逻辑：用户选择的科目能够满足专业要求
 	if len(classOptionalChoice) > 0 {
-		var subjectConditions []string
+		// 解析可选科目
+		subjectMap := map[string]string{
+			"化学": "require_chemistry",
+			"生物": "require_biology",
+			"政治": "require_politics",
+			"历史": "require_history",
+			"地理": "require_geography",
+		}
+
+		// 用户没有选择的科目，专业不能要求
+		userSelectedSubjects := make(map[string]bool)
 		for _, subject := range classOptionalChoice {
-			// 检查选科要求中是否包含该科目
-			subjectConditions = append(subjectConditions, fmt.Sprintf("subject_requirement_raw LIKE '%%%s%%'", subject))
+			userSelectedSubjects[subject] = true
+		}
+
+		var subjectConditions []string
+		allSubjects := []string{"化学", "生物", "政治", "历史", "地理"}
+		for _, subject := range allSubjects {
+			if field, exists := subjectMap[subject]; exists {
+				if userSelectedSubjects[subject] {
+					// 用户选择了这个科目，专业可以要求也可以不要求
+					// 不添加限制条件
+				} else {
+					// 用户没有选择这个科目，专业不能要求
+					subjectConditions = append(subjectConditions, fmt.Sprintf("%s = false", field))
+				}
+			}
 		}
 
 		if len(subjectConditions) > 0 {
-			// 至少匹配一个科目
-			conditions = append(conditions, "("+strings.Join(subjectConditions, " OR ")+")")
+			conditions = append(conditions, "("+strings.Join(subjectConditions, " AND ")+")")
 		}
 	}
 
