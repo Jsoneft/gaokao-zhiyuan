@@ -212,6 +212,28 @@ run_tests() {
     test_api "验证历史类488分对应排名25516" \
         "curl -s -X GET '$BASE_URL/api/report/get?rank=15000&class_first_choise=历史&province=湖北&page=1&page_size=1'" \
         "200"
+    
+    # 测试新增的fuzzy_subject_category参数 - 模糊查询包含"临床"的专业名称
+    test_api "测试fuzzy_subject_category模糊查询临床类专业" \
+        "curl -s -X GET '$BASE_URL/api/report/get?rank=18888&class_first_choise=物理&strategy=0&page=1&page_size=3&fuzzy_subject_category=临床'" \
+        "200"
+    
+    # 测试fuzzy_subject_category参数 - 模糊查询包含"计算机"的专业名称
+    test_api "测试fuzzy_subject_category模糊查询计算机类专业" \
+        "curl -s -X GET '$BASE_URL/api/report/get?rank=18888&class_first_choise=物理&strategy=0&page=1&page_size=3&fuzzy_subject_category=计算机'" \
+        "200"
+    
+    # 测试fuzzy_subject_category参数 - 模糊查询包含"电气"的专业名称
+    test_api "测试fuzzy_subject_category模糊查询电气工程类专业" \
+        "curl -s -X GET '$BASE_URL/api/report/get?rank=18888&class_first_choise=物理&strategy=0&page=1&page_size=3&fuzzy_subject_category=电气'" \
+        "200"
+    
+    # 测试fuzzy_subject_category参数 - 模糊查询包含"工程"的专业名称
+    test_api "测试fuzzy_subject_category模糊查询工程类专业" \
+        "curl -s -X GET '$BASE_URL/api/report/get?rank=18888&class_first_choise=物理&strategy=0&page=1&page_size=3&fuzzy_subject_category=工程'" \
+        "200"
+    
+
 }
 
 # 生成测试报告

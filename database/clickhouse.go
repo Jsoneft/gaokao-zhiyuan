@@ -338,9 +338,9 @@ func (db *ClickHouseDB) QueryScoreByRank(province string, year int, rank int64, 
 }
 
 // 新的报表查询接口 - 使用新表结构
-func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, classOptionalChoice []string, province string, page, pageSize int64, collegeLocation []string, interest []string, strategy int) (*models.Response, error) {
-	log.Printf("报表查询参数: rank=%d, classFirstChoice=%s, classOptionalChoice=%v, province=%s, page=%d, pageSize=%d, collegeLocation=%v, interest=%v, strategy=%d",
-		rank, classFirstChoice, classOptionalChoice, province, page, pageSize, collegeLocation, interest, strategy)
+func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, classOptionalChoice []string, province string, page, pageSize int64, collegeLocation []string, interest []string, strategy int, fuzzySubjectCategory string) (*models.Response, error) {
+	log.Printf("报表查询参数: rank=%d, classFirstChoice=%s, classOptionalChoice=%v, province=%s, page=%d, pageSize=%d, collegeLocation=%v, interest=%v, strategy=%d, fuzzySubjectCategory=%s",
+		rank, classFirstChoice, classOptionalChoice, province, page, pageSize, collegeLocation, interest, strategy, fuzzySubjectCategory)
 
 	// 根据位次查询对应分数
 	var rankScoreUint16 uint16
@@ -412,7 +412,14 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 		}
 	}
 
-	// 4. 四次筛选：分数（省生源地排位）筛选 - 冲稳保策略
+	// 4. 模糊专业名称筛选
+	if fuzzySubjectCategory != "" {
+		conditions = append(conditions, fmt.Sprintf("major_name LIKE $%d", argIndex))
+		args = append(args, "%"+fuzzySubjectCategory+"%")
+		argIndex++
+	}
+
+	// 5. 分数（省生源地排位）筛选 - 冲稳保策略
 	var upperScore, lowerScore int64
 	var minScoreDiff, maxScoreDiff int64
 

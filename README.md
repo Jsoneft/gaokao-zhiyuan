@@ -2,6 +2,31 @@
 
 ## 更新日志
 
+### 2024-12-29 (最新)
+- ✨ **新增功能**: 在报表查询接口中新增 `fuzzy_subject_category` 参数支持专业名称模糊查询
+- 🔒 **安全增强**: 添加了完善的SQL注入防护机制
+  - 使用正则表达式验证参数格式，只允许字母、数字、中文和基本标点符号
+  - 限制参数长度不超过50个字符
+  - 使用参数化查询（Prepared Statement）防止SQL注入
+- 🔧 **功能实现**:
+  - API接口: `/api/report/get?fuzzy_subject_category=计算机` 支持模糊匹配专业名称
+  - 数据库层: 在SQL查询中添加 `major_name LIKE '%fuzzy_subject_category%'` 条件
+  - 参数校验: 严格的输入验证确保系统安全性
+- 📝 **使用示例**:
+  ```bash
+  # 模糊查询包含"计算机"的专业名称
+  curl "http://localhost:8031/api/report/get?rank=18888&class_first_choise=物理&strategy=0&page=1&page_size=3&fuzzy_subject_category=计算机"
+  
+  # 模糊查询包含"临床"的专业名称
+  curl "http://localhost:8031/api/report/get?rank=18888&class_first_choise=物理&strategy=0&page=1&page_size=3&fuzzy_subject_category=临床"
+  
+  # 模糊查询包含"电气"的专业名称
+  curl "http://localhost:8031/api/report/get?rank=18888&class_first_choise=物理&strategy=0&page=1&page_size=3&fuzzy_subject_category=电气"
+  
+     # 模糊查询包含"物理"的专业名称
+   curl "http://localhost:8031/api/report/get?rank=18888&class_first_choise=物理&strategy=0&page=1&page_size=3&fuzzy_subject_category=物理学"
+  ```
+
 ### 2024-12-29
 - 🐛 **重要修复**: 修复了API接口中排名转分数逻辑的关键错误
 - 🔧 **问题描述**: 排名18888查询时返回511分，实际应为590-600分范围

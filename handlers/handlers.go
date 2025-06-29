@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"gaokao-zhiyuan/database"
@@ -118,7 +119,7 @@ func (h *Handler) QueryRank(c *gin.Context) {
 }
 
 // 报表查询接口 - 新版本
-// GET /api/report/get?rank=333&class_first_choise=物理&class_optional_choise=["化学","生物"]&province=湖北&page=1&page_size=10&college_location=["湖北"]&interest=["理科","工科"]&strategy=0
+// GET /api/report/get?rank=333&class_first_choise=物理&class_optional_choise=["化学","生物"]&province=湖北&page=1&page_size=10&college_location=["湖北"]&interest=["理科","工科"]&strategy=0&fuzzy_subject_category=物理
 func (h *Handler) GetReport(c *gin.Context) {
 	// 获取参数
 	rankStr := c.Query("rank")
@@ -130,6 +131,7 @@ func (h *Handler) GetReport(c *gin.Context) {
 	collegeLocationStr := c.Query("college_location")
 	interestStr := c.Query("interest")
 	strategyStr := c.DefaultQuery("strategy", "0")
+	fuzzySubjectCategory := c.Query("fuzzy_subject_category")
 
 	// 参数验证
 	if rankStr == "" {
@@ -164,6 +166,27 @@ func (h *Handler) GetReport(c *gin.Context) {
 		strategy = 0
 	}
 
+	// SQL注入防护：fuzzy_subject_category参数校验
+	if fuzzySubjectCategory != "" {
+		// 只允许字母、数字、中文和基本标点符号，防止SQL注入
+		validPattern := regexp.MustCompile(`^[a-zA-Z0-9\p{Han}\s\-_()（）]+$`)
+		if !validPattern.MatchString(fuzzySubjectCategory) {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code": 1,
+				"msg":  "fuzzy_subject_category参数包含非法字符",
+			})
+			return
+		}
+		// 限制参数长度，防止过长的输入
+		if len(fuzzySubjectCategory) > 50 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code": 1,
+				"msg":  "fuzzy_subject_category参数长度不能超过50个字符",
+			})
+			return
+		}
+	}
+
 	// 解析JSON数组参数
 	var classOptionalChoice []string
 	if classOptionalChoiceStr != "" {
@@ -189,11 +212,11 @@ func (h *Handler) GetReport(c *gin.Context) {
 		}
 	}
 
-	log.Printf("报表查询请求: rank=%d, classFirstChoice=%s, classOptionalChoice=%v, province=%s, page=%d, pageSize=%d, collegeLocation=%v, interest=%v, strategy=%d",
-		rank, classFirstChoice, classOptionalChoice, province, page, pageSize, collegeLocation, interest, strategy)
+	log.Printf("报表查询请求: rank=%d, classFirstChoice=%s, classOptionalChoice=%v, province=%s, page=%d, pageSize=%d, collegeLocation=%v, interest=%v, strategy=%d, fuzzySubjectCategory=%s",
+		rank, classFirstChoice, classOptionalChoice, province, page, pageSize, collegeLocation, interest, strategy, fuzzySubjectCategory)
 
-	// 使用新的查询方法
-	result, err := h.db.GetReportDataNew(rank, classFirstChoice, classOptionalChoice, province, page, pageSize, collegeLocation, interest, strategy)
+	// 使用新的查询方法，传递fuzzy_subject_category参数
+	result, err := h.db.GetReportDataNew(rank, classFirstChoice, classOptionalChoice, province, page, pageSize, collegeLocation, interest, strategy, fuzzySubjectCategory)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": 1,
