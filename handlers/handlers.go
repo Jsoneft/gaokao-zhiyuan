@@ -42,8 +42,11 @@ func (h *Handler) GetRank(c *gin.Context) {
 		return
 	}
 
+	// 获取科目类别参数，默认为物理
+	subjectCategory := c.DefaultQuery("subject_category", "物理")
+
 	// 使用新的查询方法
-	rank, err := h.db.QueryRankByScoreNew(score)
+	rank, err := h.db.QueryRankByScoreNew(score, subjectCategory)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": 1,

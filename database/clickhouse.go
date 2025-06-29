@@ -189,19 +189,20 @@ func (db *ClickHouseDB) BatchInsert(data []models.AdmissionData) error {
 }
 
 // 根据分数查询位次 - 使用新表
-func (db *ClickHouseDB) QueryRankByScoreNew(score float64) (int64, error) {
+func (db *ClickHouseDB) QueryRankByScoreNew(score float64, subjectCategory string) (int64, error) {
 	// 查询语句：根据分数查询位次
 	query := `
 		SELECT min_rank_2024
 		FROM admission_hubei_wide_2024
 		WHERE min_score_2024 >= $1
 		AND min_rank_2024 > 0
+		AND subject_category = $2
 		ORDER BY min_score_2024 ASC
 		LIMIT 1
 	`
 
 	var rank uint32
-	err := db.conn.QueryRow(context.Background(), query, score).Scan(&rank)
+	err := db.conn.QueryRow(context.Background(), query, score, subjectCategory).Scan(&rank)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// 如果没有找到记录，查询最高分对应的位次
@@ -210,11 +211,12 @@ func (db *ClickHouseDB) QueryRankByScoreNew(score float64) (int64, error) {
 				FROM admission_hubei_wide_2024
 				WHERE min_score_2024 > 0
 				AND min_rank_2024 > 0
+				AND subject_category = $1
 				ORDER BY min_score_2024 DESC
 				LIMIT 1
 			`
 			var estimateRank uint32
-			err = db.conn.QueryRow(context.Background(), estimateQuery).Scan(&estimateRank)
+			err = db.conn.QueryRow(context.Background(), estimateQuery, subjectCategory).Scan(&estimateRank)
 			if err != nil {
 				return 0, errors.New("无法估算位次")
 			}
@@ -345,12 +347,12 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 	scoreQuery := `
 		SELECT min_score_2024 
 		FROM default.admission_hubei_wide_2024 
-		WHERE min_rank_2024 <= ? AND min_rank_2024 > 0
+		WHERE min_rank_2024 <= ? AND min_rank_2024 > 0 AND subject_category = ?
 		ORDER BY min_rank_2024 DESC 
 		LIMIT 1
 	`
 
-	row := db.conn.QueryRow(context.Background(), scoreQuery, rank)
+	row := db.conn.QueryRow(context.Background(), scoreQuery, rank, classFirstChoice)
 	err := row.Scan(&rankScoreUint16)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -358,11 +360,11 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 			nearbyQuery := `
 				SELECT min_score_2024 
 				FROM default.admission_hubei_wide_2024 
-				WHERE min_rank_2024 > 0
+				WHERE min_rank_2024 > 0 AND subject_category = ?
 				ORDER BY ABS(min_rank_2024 - ?)
 				LIMIT 1
 			`
-			row = db.conn.QueryRow(context.Background(), nearbyQuery, rank)
+			row = db.conn.QueryRow(context.Background(), nearbyQuery, classFirstChoice, rank)
 			err = row.Scan(&rankScoreUint16)
 			if err != nil {
 				log.Printf("无法找到位次 %d 附近的数据，使用默认分数 500", rank)
@@ -378,8 +380,7 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 		log.Printf("位次 %d 对应的分数为 %d", rank, rankScoreUint16)
 	}
 
-	// 转换为int64供后续计算使用
-	rankScore := int64(rankScoreUint16)
+	// 注意：rankScore 变量在新的排名策略中不再需要，因为我们直接使用用户输入的排名
 
 	// 构建查询条件
 	var conditions []string
@@ -431,6 +432,7 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 	}
 
 	// 计算实际分数范围
+	rankScore := int64(rankScoreUint16)
 	lowerScore = rankScore
 	upperScore = rankScore
 
@@ -907,6 +909,6 @@ func (db *ClickHouseDB) GetDataCount() (int64, error) {
 
 // 根据分数查询位次（简化版，不考虑科类和选科条件）
 func (db *ClickHouseDB) QueryRankByScoreSimple(province string, year int, score float64) (int64, error) {
-	// 使用新表查询
-	return db.QueryRankByScoreNew(score)
+	// 使用新表查询，默认查询物理类
+	return db.QueryRankByScoreNew(score, "物理")
 }
