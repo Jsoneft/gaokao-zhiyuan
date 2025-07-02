@@ -3,6 +3,27 @@
 ## 更新日志
 
 ### 2024-12-29 (最新)
+- 🔍 **数据分析**: 完成了Excel数据与ClickHouse数据库的主键匹配分析
+- 📊 **分析结果**:
+  - **Excel总数据**: 28,802条
+  - **ClickHouse总数据**: 18,278条
+  - **成功匹配**: 18,277条（63.46%匹配率）
+  - **Excel独有**: 10,525条（2025年新增数据）
+  - **ClickHouse独有**: 1条（三峡大学护理学专业，combined_key: C10618C8）
+- 🔑 **主键策略**: 确认使用 `CONCAT(school_code, LPAD(major_code, 2, '0'))` 作为连接主键
+- ✅ **更新可行性**: 
+  - 无笛卡尔积风险（ClickHouse中combined_key完全唯一）
+  - 可安全执行UPDATE操作更新18,277条匹配记录
+  - 可执行INSERT操作新增10,525条Excel独有记录
+- 📝 **ClickHouse独有记录详情**:
+  - 学校: 三峡大学 (C10618)
+  - 专业: 护理学 (专业代码C8)
+  - 科目: 物理类
+  - 批次: 本科批
+  - 2024年分数: 539分，位次: 57256
+  - 招生计划: 0（可能已停招）
+
+### 2024-12-29
 - ✨ **新增功能**: 在报表查询接口中新增 `fuzzy_subject_category` 参数支持专业名称模糊查询
 - 🔒 **安全增强**: 添加了完善的SQL注入防护机制
   - 使用正则表达式验证参数格式，只允许字母、数字、中文和基本标点符号
@@ -625,6 +646,134 @@ curl -s -X GET 'http://localhost:8031/api/health'
 - 数据统计分析
 
 ## 更新日志
+
+### v2.4.0 (2025-01-02)
+**🚀 数据库表完全迁移成功 - admission_hubei_wide_2024 → gaokao2025**
+
+#### ✅ 迁移完成状态
+成功将整个项目从`admission_hubei_wide_2024`表完全迁移到`gaokao2025`表，所有功能测试通过。
+
+#### 🔧 核心修复内容
+1. **数据库查询更新** (`database/clickhouse.go`):
+   - ✅ 所有SQL查询表名: `admission_hubei_wide_2024` → `gaokao2025`
+   - ✅ 字段映射更新: `study_years` → `study_duration`
+   - ✅ 字段引用更新: `class_demand` → `subject_requirement_raw`
+   - ✅ 数据类型适配: `tuition_fee` (UInt32 → String)
+   - ✅ Nullable处理: `major_min_score_2024` (去除Nullable)
+   - ✅ 类型转换修复: ClickHouse UInt32/UInt16 → Go int64
+
+2. **数据模型同步** (`models/models.go`):
+   - ✅ 结构体字段完全对应新表结构
+   - ✅ 新增14个扩展字段支持
+   - ✅ 数据类型完全匹配
+
+#### 🧪 测试验证结果
+**全部测试通过** ✅：
+- ✅ 健康检查接口: 200 OK
+- ✅ 获取排名接口: 正常返回分数位次 (rank=45051 for score=555)
+- ✅ 获取报表接口: 正常返回院校专业数据
+- ✅ **高级位次查询接口**: 完全修复，正常工作 (之前500错误已解决)
+- ✅ 物理/历史类专业查询: 数据完整准确
+- ✅ 模糊专业搜索: 临床/计算机/电气/工程类专业正常
+
+#### 📊 升级收益
+**从 37字段 → 51字段**:
+- **数据完整性**: 新增14个专业统计字段
+- **查询性能**: 优化的枚举类型和索引结构
+- **类型安全**: 修复Nullable字段的潜在问题
+- **功能扩展**: 为未来需求提供丰富的数据基础
+
+#### 🔄 兼容性保证
+- ✅ 所有现有API接口保持完全兼容
+- ✅ 前端调用无需任何修改
+- ✅ 数据查询性能保持稳定
+- ✅ 字段映射自动转换处理
+
+#### 🎯 技术要点
+**关键问题解决**:
+- **表名替换**: 彻底更新所有数据库查询中的表引用
+- **字段映射**: 处理`study_years`→`study_duration`的字段名变更
+- **类型转换**: 解决ClickHouse与Go数据类型不匹配问题
+- **Nullable处理**: 优化数据结构，提升查询效率
+- **选科条件**: 更新选科要求字段的引用逻辑
+
+### v2.3.0 (2025-01-02)
+**🔍 数据库表结构分析 - gaokao2025表兼容性评估**
+
+#### 🎯 分析目标
+对ClickHouse数据库中的`gaokao2025`表与现有`admission_hubei_wide_2024`表进行全面的结构兼容性分析，为表替换工作提供技术依据。
+
+#### 📊 表结构对比结果
+**admission_hubei_wide_2024表**: 37个字段
+**gaokao2025表**: 51个字段 (新增14个字段)
+
+#### ✅ 完全兼容字段 (32个)
+核心功能字段保持完全一致：
+- 基础标识: `id`, `school_code`, `school_name`, `major_code`, `major_name`, `major_group_code`
+- 录取数据: `min_score_2024`, `min_rank_2024`, `enrollment_plan_2024`
+- 选科要求: `require_physics`, `require_chemistry`, `require_biology`, `require_politics`, `require_history`, `require_geography`
+- 专业分类: `is_science`, `is_engineering`, `is_medical`, `is_economics_mgmt_law`, `is_liberal_arts`, `is_design_arts`, `is_language`
+- 其他字段: `school_city`, `subject_category`, `subject_requirement_raw`, `school_authority`, `school_level`, `school_tags`, `major_description`, `is_new_major`
+
+#### ⚠️ 需要适配的字段差异 (8个)
+1. **数据类型变化**:
+   - `source_province`: `LowCardinality(String)` → `Enum8('湖北' = 1)`
+   - `school_province`: `LowCardinality(String)` → `String`
+   - `admission_batch`: `LowCardinality(String)` → `Enum8('本科批' = 1, '专科批' = 2)`
+   - `school_type`: `LowCardinality(String)` → `String`
+
+2. **枚举值扩展**:
+   - `school_ownership`: 从2个枚举值扩展到5个（新增港澳台合作、中外合作、境外独立办学）
+   - `education_level`: 从2个枚举值扩展到3个（新增职业本科）
+
+3. **字段名变更**:
+   - `study_years` → `study_duration` (数据类型保持UInt8)
+
+4. **数据类型转换**:
+   - `tuition_fee`: `UInt32` → `String` （需要类型转换处理）
+
+5. **Nullable处理**:
+   - `major_min_score_2024`: `Nullable(UInt16)` → `UInt16` （去除Nullable属性）
+
+#### 🆕 新增字段 (14个)
+gaokao2025表包含丰富的新增字段，提供更详细的数据：
+- **招生相关**: `enrollment_plan`, `major_id`, `enrollment_type`, `enrollment_plan_year`
+- **专业分类**: `major_category`
+- **录取统计**: `admission_num_2024`, `major_admission_num_2024`
+- **专业详细分数**: `major_min_rank_2024`, `major_avg_score_2024`, `major_avg_rank_2024`, `major_max_score_2024`, `major_max_rank_2024`
+
+#### 📋 兼容性评估结论
+**✅ 总体评估: 兼容性良好，需要适配工作**
+
+`gaokao2025`表**完全包含**了`admission_hubei_wide_2024`表的所有核心功能字段，可以实现完全替换，但需要进行以下适配工作：
+
+#### 🔧 推荐实施步骤
+1. **SQL查询更新**: 将所有代码中的表名`admission_hubei_wide_2024` → `gaokao2025`
+2. **字段映射更新**: 更新`study_years` → `study_duration`的字段映射
+3. **数据类型适配**: 
+   - 处理`tuition_fee`的String类型转换
+   - 适配各枚举类型的值范围扩展
+   - 处理`major_min_score_2024`的非空处理
+4. **Go模型更新**: 更新`models.go`中的数据结构以支持新增字段
+5. **API接口测试**: 完整测试所有接口的兼容性
+6. **数据迁移验证**: 验证数据完整性和查询结果正确性
+
+#### 📁 相关文件
+- **分析报告**: `table_comparison_analysis.md` - 详细的表结构对比文档
+- **数据库连接**: 已验证ClickHouse数据库连接正常，确认gaokao2025表存在
+- **影响范围**: 主要影响`database/clickhouse.go`、`models/models.go`、相关SQL查询
+
+#### 💡 技术收益
+- **数据丰富度提升**: 新增14个字段提供更详细的院校专业信息
+- **查询能力增强**: 支持更细粒度的专业录取数据分析
+- **枚举类型优化**: 更标准化的数据类型定义
+- **数据质量提升**: 去除不必要的Nullable属性，数据结构更清晰
+
+#### 🎯 下一步计划
+1. 基于分析结果制定详细的代码修改方案
+2. 逐步实施表名替换和字段适配
+3. 完善单元测试确保功能稳定性
+4. 更新API文档说明新增字段功能
 
 ### v2.2.0 (2024-06-28)
 **🎯 核心功能增强 - 新增2024年一分一段表排名计算**

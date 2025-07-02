@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"gaokao-zhiyuan/config"
@@ -84,38 +85,38 @@ func (db *ClickHouseDB) Close() error {
 // 创建新的湖北省数据表
 func (db *ClickHouseDB) CreateTable() error {
 	query := `
-	CREATE TABLE IF NOT EXISTS admission_hubei_wide_2024 (
+	CREATE TABLE IF NOT EXISTS gaokao2025 (
 		id                      UInt32,
 		school_code             String,
 		school_name             String,
 		major_code              String,
 		major_name              String,
 		major_group_code        String,
-		source_province         LowCardinality(String),
-		school_province         LowCardinality(String),
+		source_province         Enum8('湖北' = 1),
+		school_province         String,
 		school_city             String,
-		admission_batch         LowCardinality(String),
-		subject_category        Enum8('物理'=1, '历史'=2),
+		admission_batch         Enum8('本科批' = 1, '专科批' = 2),
+		subject_category        Enum8('物理' = 1, '历史' = 2),
 		require_physics         Bool,
 		require_chemistry       Bool,
 		require_biology         Bool,
 		require_politics        Bool,
 		require_history         Bool,
 		require_geography       Bool,
-		subject_requirement_raw LowCardinality(String),
-		school_type             LowCardinality(String),
-		school_ownership        Enum8('公办'=1, '民办'=2),
-		school_authority        LowCardinality(String),
-		school_level            LowCardinality(String),
+		subject_requirement_raw String,
+		school_type             String,
+		school_ownership        Enum8('公办' = 1, '内地与港澳台合作办学' = 2, '中外合作办学' = 3, '民办' = 4, '境外高校独立办学' = 5),
+		school_authority        String,
+		school_level            String,
 		school_tags             String,
-		education_level         Enum8('本科'=1, '专科'=2),
+		education_level         Enum8('本科' = 1, '职业本科' = 2, '专科' = 3),
 		major_description       String,
-		study_years             UInt8,
-		tuition_fee             UInt32,
+		study_duration          UInt8,
+		tuition_fee             String,
 		is_new_major            Bool,
 		min_score_2024          UInt16,
 		min_rank_2024           UInt32,
-		major_min_score_2024    Nullable(UInt16),
+		major_min_score_2024    UInt16,
 		enrollment_plan_2024    UInt16,
 		is_science              Bool,
 		is_engineering          Bool,
@@ -193,7 +194,7 @@ func (db *ClickHouseDB) QueryRankByScoreNew(score float64, subjectCategory strin
 	// 查询语句：根据分数查询位次
 	query := `
 		SELECT min_rank_2024
-		FROM admission_hubei_wide_2024
+		FROM gaokao2025
 		WHERE min_score_2024 >= $1
 		AND min_rank_2024 > 0
 		AND subject_category = $2
@@ -208,7 +209,7 @@ func (db *ClickHouseDB) QueryRankByScoreNew(score float64, subjectCategory strin
 			// 如果没有找到记录，查询最高分对应的位次
 			estimateQuery := `
 				SELECT min_rank_2024
-				FROM admission_hubei_wide_2024
+				FROM gaokao2025
 				WHERE min_score_2024 > 0
 				AND min_rank_2024 > 0
 				AND subject_category = $1
@@ -235,51 +236,49 @@ func (db *ClickHouseDB) QueryRankByScore(province string, year int, score float6
 	if len(classDemands) > 0 {
 		conditions := make([]string, 0, len(classDemands))
 		for _, demand := range classDemands {
-			conditions = append(conditions, fmt.Sprintf("class_demand LIKE '%%%s%%'", demand))
+			conditions = append(conditions, fmt.Sprintf("subject_requirement_raw LIKE '%%%s%%'", demand))
 		}
 		classDemandCondition = "AND (" + strings.Join(conditions, " OR ") + ")"
 	}
 
 	// 查询语句：根据分数查询位次
-	// 使用lowest_rank排序，找到分数大于等于给定分数的最大位次
+	// 使用min_rank_2024排序，找到分数大于等于给定分数的最大位次
 	query := fmt.Sprintf(`
-		SELECT lowest_rank
-		FROM gaokao.admission_data
-		WHERE province = $1
-		AND year = $2
-		AND subject_type = $3
+		SELECT min_rank_2024
+		FROM default.gaokao2025
+		WHERE source_province = '湖北'
+		AND subject_category = $1
 		%s
-		AND lowest_points >= $4
-		ORDER BY lowest_points ASC
+		AND min_score_2024 >= $2
+		ORDER BY min_score_2024 ASC
 		LIMIT 1
 	`, classDemandCondition)
 
-	var rank int64
-	err := db.conn.QueryRow(context.Background(), query, province, year, subjectType, score).Scan(&rank)
+	var rank uint32
+	err := db.conn.QueryRow(context.Background(), query, subjectType, score).Scan(&rank)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// 如果没有找到记录，查询该省份该年份最低分最高的记录的位次
 			estimateQuery := `
-				SELECT lowest_rank
-				FROM gaokao.admission_data
-				WHERE province = $1
-				AND year = $2
-				AND subject_type = $3
-				AND lowest_points > 0
-				ORDER BY lowest_points DESC
+				SELECT min_rank_2024
+				FROM default.gaokao2025
+				WHERE source_province = '湖北'
+				AND subject_category = $1
+				AND min_score_2024 > 0
+				ORDER BY min_score_2024 DESC
 				LIMIT 1
 			`
-			var estimateRank int64
-			err = db.conn.QueryRow(context.Background(), estimateQuery, province, year, subjectType).Scan(&estimateRank)
+			var estimateRank uint32
+			err = db.conn.QueryRow(context.Background(), estimateQuery, subjectType).Scan(&estimateRank)
 			if err != nil {
 				return 0, errors.New("无法估算位次")
 			}
-			return estimateRank, nil
+			return int64(estimateRank), nil
 		}
 		return 0, err
 	}
 
-	return rank, nil
+	return int64(rank), nil
 }
 
 // 根据位次查询分数
@@ -289,52 +288,50 @@ func (db *ClickHouseDB) QueryScoreByRank(province string, year int, rank int64, 
 	if len(classDemands) > 0 {
 		conditions := make([]string, 0, len(classDemands))
 		for _, demand := range classDemands {
-			conditions = append(conditions, fmt.Sprintf("class_demand LIKE '%%%s%%'", demand))
+			conditions = append(conditions, fmt.Sprintf("subject_requirement_raw LIKE '%%%s%%'", demand))
 		}
 		classDemandCondition = "AND (" + strings.Join(conditions, " OR ") + ")"
 	}
 
 	// 查询语句：根据位次查询分数
-	// 使用lowest_rank排序，找到位次小于等于给定位次的最低分
+	// 使用min_rank_2024排序，找到位次小于等于给定位次的最低分
 	query := fmt.Sprintf(`
-		SELECT lowest_points
-		FROM gaokao.admission_data
-		WHERE province = $1
-		AND year = $2
-		AND subject_type = $3
+		SELECT min_score_2024
+		FROM default.gaokao2025
+		WHERE source_province = '湖北'
+		AND subject_category = $1
 		%s
-		AND lowest_rank <= $4
-		AND lowest_rank > 0
-		ORDER BY lowest_rank DESC
+		AND min_rank_2024 <= $2
+		AND min_rank_2024 > 0
+		ORDER BY min_rank_2024 DESC
 		LIMIT 1
 	`, classDemandCondition)
 
-	var score int64
-	err := db.conn.QueryRow(context.Background(), query, province, year, subjectType, rank).Scan(&score)
+	var score uint16
+	err := db.conn.QueryRow(context.Background(), query, subjectType, rank).Scan(&score)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// 如果没有找到记录，查询该省份该年份最高位次最低的记录的分数
 			estimateQuery := `
-				SELECT lowest_points
-				FROM gaokao.admission_data
-				WHERE province = $1
-				AND year = $2
-				AND subject_type = $3
-				AND lowest_rank > 0
-				ORDER BY lowest_rank ASC
+				SELECT min_score_2024
+				FROM default.gaokao2025
+				WHERE source_province = '湖北'
+				AND subject_category = $1
+				AND min_rank_2024 > 0
+				ORDER BY min_rank_2024 ASC
 				LIMIT 1
 			`
-			var estimateScore int64
-			err = db.conn.QueryRow(context.Background(), estimateQuery, province, year, subjectType).Scan(&estimateScore)
+			var estimateScore uint16
+			err = db.conn.QueryRow(context.Background(), estimateQuery, subjectType).Scan(&estimateScore)
 			if err != nil {
 				return 0, errors.New("无法估算分数")
 			}
-			return estimateScore, nil
+			return int64(estimateScore), nil
 		}
 		return 0, err
 	}
 
-	return score, nil
+	return int64(score), nil
 }
 
 // 新的报表查询接口 - 使用新表结构
@@ -346,7 +343,7 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 	var rankScoreUint16 uint16
 	scoreQuery := `
 		SELECT min_score_2024 
-		FROM default.admission_hubei_wide_2024 
+		FROM default.gaokao2025 
 		WHERE min_rank_2024 <= ? AND min_rank_2024 > 0 AND subject_category = ?
 		ORDER BY min_rank_2024 DESC 
 		LIMIT 1
@@ -359,7 +356,7 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 			// 如果没有找到精确位次，查询附近的位次
 			nearbyQuery := `
 				SELECT min_score_2024 
-				FROM default.admission_hubei_wide_2024 
+				FROM default.gaokao2025 
 				WHERE min_rank_2024 > 0 AND subject_category = ?
 				ORDER BY ABS(min_rank_2024 - ?)
 				LIMIT 1
@@ -478,7 +475,7 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 	// 查询总数
 	countQuery := fmt.Sprintf(`
 		SELECT COUNT(*) AS total_count 
-		FROM default.admission_hubei_wide_2024 
+		FROM default.gaokao2025 
 		%s
 	`, whereClause)
 
@@ -505,8 +502,8 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 			   subject_requirement_raw, school_province, school_city, 
 			   school_ownership, school_type, school_authority, school_level, 
 			   school_tags, education_level, major_description, tuition_fee, is_new_major,
-			   min_score_2024, min_rank_2024, major_name, study_years, major_min_score_2024
-		FROM default.admission_hubei_wide_2024 
+			   min_score_2024, min_rank_2024, major_name, study_duration, major_min_score_2024
+		FROM default.gaokao2025 
 		%s
 		ORDER BY min_score_2024 DESC
 		LIMIT $%d OFFSET $%d
@@ -529,17 +526,17 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 		var schoolName, schoolCode, groupCode, subjectReq, schoolProvince, schoolCity string
 		var schoolOwnership, schoolType, schoolAuthority, schoolLevel, schoolTags string
 		var educationLevel, majorDesc, majorName string
-		var tuitionFee uint32
+		var tuitionFee string
 		var isNewMajor bool
 		var minScore uint16
 		var minRank uint32
-		var studyYears sql.NullString
-		var majorMinScore *uint16
+		var studyDuration sql.NullString
+		var majorMinScore uint16
 
 		err := rows.Scan(&id, &schoolName, &schoolCode, &groupCode, &subjectReq,
 			&schoolProvince, &schoolCity, &schoolOwnership, &schoolType, &schoolAuthority,
 			&schoolLevel, &schoolTags, &educationLevel, &majorDesc, &tuitionFee, &isNewMajor,
-			&minScore, &minRank, &majorName, &studyYears, &majorMinScore)
+			&minScore, &minRank, &majorName, &studyDuration, &majorMinScore)
 		if err != nil {
 			log.Printf("扫描行数据错误: %v", err)
 			continue
@@ -547,21 +544,33 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 
 		// 处理学制字段
 		var studyYearsPtr *string
-		if studyYears.Valid {
-			studyYearsPtr = &studyYears.String
+		if studyDuration.Valid {
+			studyYearsPtr = &studyDuration.String
 		}
 
-		// 处理专业最低分字段 - 直接使用扫描出的指针
-		var majorMinScorePtr *uint16 = majorMinScore
+		// 处理专业最低分字段 - 现在是非指针类型
+		var majorMinScorePtr *uint16
+		if majorMinScore > 0 {
+			majorMinScorePtr = &majorMinScore
+		}
 
 		// 计算专业最低分对应的2024年排名
 		var majorMinRank2024Ptr *int
-		if majorMinScore != nil && *majorMinScore > 0 {
+		if majorMinScore > 0 {
 			// 直接使用用户选择的首选科目类型
 			subjectType := classFirstChoice
 			// 使用专业最低分计算2024年排名
-			rank2024 := GetRankByScore2024(int(*majorMinScore), subjectType)
+			rank2024 := GetRankByScore2024(int(majorMinScore), subjectType)
 			majorMinRank2024Ptr = &rank2024
+		}
+
+		// 处理学费字段 - 转换为uint32
+		var tuitionFeeUint32 *uint32
+		if tuitionFee != "" {
+			if fee, err := strconv.ParseUint(tuitionFee, 10, 32); err == nil {
+				feeUint32 := uint32(fee)
+				tuitionFeeUint32 = &feeUint32
+			}
 		}
 
 		// 转换数据类型 - 确保类型匹配
@@ -584,7 +593,7 @@ func (db *ClickHouseDB) GetReportDataNew(rank int64, classFirstChoice string, cl
 			CollegeTags:              &schoolTags,
 			EducationLevel:           &educationLevel,
 			MajorDescription:         &majorDesc,
-			TuitionFee:               &tuitionFee,
+			TuitionFee:               tuitionFeeUint32,
 			IsNewMajor:               &isNewMajor,
 			LowestPoints:             &lowestPointsInt64,
 			LowestRank:               &lowestRankInt64,
@@ -906,7 +915,7 @@ func buildClassCondition(classComb string) string {
 // 获取数据记录数
 func (db *ClickHouseDB) GetDataCount() (int64, error) {
 	var count int64
-	row := db.conn.QueryRow(context.Background(), "SELECT count() FROM admission_hubei_wide_2024")
+	row := db.conn.QueryRow(context.Background(), "SELECT count() FROM gaokao2025")
 	err := row.Scan(&count)
 	if err != nil {
 		return 0, err
