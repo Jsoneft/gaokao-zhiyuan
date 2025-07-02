@@ -233,6 +233,11 @@ run_tests() {
         "curl -s -X GET '$BASE_URL/api/report/get?rank=18888&class_first_choise=物理&strategy=0&page=1&page_size=3&fuzzy_subject_category=工程'" \
         "200"
     
+    # 测试特定参数组合案例：物理类考生，885位次，化学+地理组合
+    test_api "测试特定参数组合：物理+化学地理组合885位次" \
+        "curl -s -X GET '$BASE_URL/api/report/get?class_first_choise=物理&class_optional_choise=[\"化学\",\"地理\"]&province=湖北&rank=885&college_location=[]&page=1&strategy=0&page_size=20'" \
+        "200"
+    
 
 }
 

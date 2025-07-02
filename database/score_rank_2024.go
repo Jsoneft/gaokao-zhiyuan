@@ -144,18 +144,18 @@ func GetRankByScore2024(score int, subjectType string) int {
 		data = scoreRankTable2024.Physics
 	}
 
-	// 如果数据为空，返回估算值
+	// 数据为空时的异常处理（理论上不应该发生）
 	if len(data) == 0 {
-		log.Printf("一分一段表数据为空，使用估算排名")
-		return estimateRank(score, subjectType)
+		log.Printf("严重错误：一分一段表数据为空")
+		return 1 // 返回最佳排名作为默认值
 	}
 
-	// 如果分数高于最高分，返回最高排名
+	// 如果分数高于最高分，返回最高排名（最佳排名）
 	if score >= data[0].Score {
 		return data[0].Rank
 	}
 
-	// 如果分数低于最低分，返回最低排名
+	// 如果分数低于最低分，返回最低排名（最差排名）
 	if score <= data[len(data)-1].Score {
 		return data[len(data)-1].Rank
 	}
@@ -174,35 +174,23 @@ func GetRankByScore2024(score int, subjectType string) int {
 			scoreDiff := score - data[i+1].Score
 			interpolatedRank := data[i+1].Rank - (rankRange * scoreDiff / scoreRange)
 
-			return interpolatedRank
+			// 确保插值结果为正数
+			return ensurePositiveRank(interpolatedRank)
 		}
 	}
 
-	// 如果没有找到，返回估算值
-	return estimateRank(score, subjectType)
+	// 理论上不应该到达这里，但作为保险返回中位排名
+	log.Printf("警告：分数 %d 未找到对应区间，返回中位排名", score)
+	midIndex := len(data) / 2
+	return data[midIndex].Rank
 }
 
-// 估算排名（当数据不可用时使用）
-func estimateRank(score int, subjectType string) int {
-	if subjectType == "历史" {
-		// 历史类估算：大约每分300-400名
-		if score >= 600 {
-			return (650 - score) * 300
-		} else if score >= 500 {
-			return 15000 + (600-score)*350
-		} else {
-			return 50000 + (500-score)*400
-		}
-	} else {
-		// 物理类估算：大约每分500-700名
-		if score >= 600 {
-			return (650 - score) * 500
-		} else if score >= 500 {
-			return 25000 + (600-score)*600
-		} else {
-			return 85000 + (500-score)*700
-		}
+// ensurePositiveRank 确保排名为正数，最小值为1
+func ensurePositiveRank(rank int) int {
+	if rank <= 0 {
+		return 1 // 最好的排名是第1名
 	}
+	return rank
 }
 
 // GetSubjectTypeFromClassDemand 从选科要求中推断首选科目
